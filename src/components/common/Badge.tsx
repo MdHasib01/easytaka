@@ -25,7 +25,8 @@ export const Badge: React.FC<BadgeProps> = ({
     Silver: 'bg-slate-500/30 text-slate-200 border-slate-400/40',
     Gold: 'bg-yellow-500/30 text-yellow-300 border-yellow-400/50 shadow-sm shadow-yellow-500/20',
     Platinum: 'bg-cyan-500/30 text-cyan-200 border-cyan-400/50 shadow-sm shadow-cyan-500/20',
-    Diamond: 'bg-purple-500/30 text-purple-200 border-purple-400/50 shadow-md shadow-purple-500/30'
+    Diamond: 'bg-purple-500/30 text-purple-200 border-purple-400/50 shadow-md shadow-purple-500/30',
+    Legendary: 'bg-rose-500/30 text-rose-200 border-rose-400/60 shadow-lg shadow-rose-500/40 ring-1 ring-amber-400/50'
   };
 
   const variantStyles = {

@@ -43,7 +43,7 @@ export const MissionDetailsPage: React.FC = () => {
           onChange={(e) => setSelectedId(e.target.value)}
           className="flex-1 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs"
         >
-          {missions.map(m => (
+          {(missions || []).map(m => (
             <option key={m.id} value={m.id}>{m.title} ({m.brandName})</option>
           ))}
         </select>

@@ -1,4 +1,4 @@
-export type AppRole = 'admin' | 'smm';
+export type AppRole = 'admin' | 'smm' | 'smm-executive';
 
 export type DetailedRole = 
   | 'Super Admin'
@@ -131,7 +131,7 @@ export interface RapidMission {
   } | null;
 }
 
-export type BadgeTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+export type BadgeTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond' | 'Legendary';
 
 export interface BadgeItem {
   id: string;

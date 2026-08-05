@@ -254,7 +254,8 @@ export const BrandsPage: React.FC = () => {
                         key={emoji}
                         type="button"
                         onClick={() => setLogo(emoji)}
-                        className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all cursor-pointer ${
+                        aria-pressed={logo === emoji}
+                        className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                           logo === emoji ? 'bg-indigo-600 border-2 border-amber-300 scale-110 shadow-lg' : 'bg-white/5 hover:bg-white/10 border border-white/10'
                         }`}
                       >
@@ -272,7 +273,8 @@ export const BrandsPage: React.FC = () => {
                         key={plat}
                         type="button"
                         onClick={() => setPrimaryPlatform(plat)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        aria-pressed={primaryPlatform === plat}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                           primaryPlatform === plat ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                         }`}
                       >
@@ -289,8 +291,9 @@ export const BrandsPage: React.FC = () => {
               <div className="space-y-4 animate-fadeIn">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Target SMM Workforce</label>
+                    <label htmlFor="target-smms" className="block text-xs font-bold text-slate-300 mb-1">Target SMM Workforce</label>
                     <input
+                      id="target-smms"
                       type="number"
                       value={targetSMMs}
                       onChange={(e) => setTargetSMMs(Number(e.target.value))}
@@ -298,8 +301,9 @@ export const BrandsPage: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">District Coverage</label>
+                    <label htmlFor="district-coverage" className="block text-xs font-bold text-slate-300 mb-1">District Coverage</label>
                     <input
+                      id="district-coverage"
                       type="number"
                       value={districtCount}
                       onChange={(e) => setDistrictCount(Number(e.target.value))}
@@ -309,8 +313,9 @@ export const BrandsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Team Structure Model</label>
+                  <label htmlFor="team-structure" className="block text-xs font-bold text-slate-300 mb-1">Team Structure Model</label>
                   <select
+                    id="team-structure"
                     value={teamStructure}
                     onChange={(e) => setTeamStructure(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500"
@@ -327,7 +332,7 @@ export const BrandsPage: React.FC = () => {
             {step === 4 && (
               <div className="space-y-4 animate-fadeIn">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Monthly Allocated Budget (৳)</label>
+                  <label htmlFor="monthly-budget" className="block text-xs font-bold text-slate-300 mb-1">Monthly Allocated Budget (৳)</label>
                   <input
                     type="number"
                     value={monthlyBudget}

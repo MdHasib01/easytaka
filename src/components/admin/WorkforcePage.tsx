@@ -236,8 +236,9 @@ export const WorkforcePage: React.FC = () => {
             {step === 1 && (
               <div className="space-y-3 animate-fadeIn">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Full Name *</label>
+                  <label htmlFor="wf-name" className="block text-xs font-bold text-slate-300 mb-1">Full Name *</label>
                   <input
+                    id="wf-name"
                     type="text"
                     required
                     placeholder="e.g. Anika Chowdhury"
@@ -248,8 +249,9 @@ export const WorkforcePage: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Phone Number *</label>
+                    <label htmlFor="wf-phone" className="block text-xs font-bold text-slate-300 mb-1">Phone Number *</label>
                     <input
+                      id="wf-phone"
                       type="text"
                       required
                       placeholder="+880 1711-223344"
@@ -259,8 +261,9 @@ export const WorkforcePage: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">District Hub</label>
+                    <label htmlFor="wf-district" className="block text-xs font-bold text-slate-300 mb-1">District Hub</label>
                     <select
+                      id="wf-district"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500"

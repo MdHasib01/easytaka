@@ -22,7 +22,7 @@ export const SMMNotificationsPage: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {notifications.map(n => (
+        {(notifications || []).map(n => (
           <GlassCard key={n.id} glow="purple" className="flex items-start gap-4">
             <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-400 shrink-0">
               <Bell className="w-5 h-5" />

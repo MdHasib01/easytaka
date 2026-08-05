@@ -35,7 +35,7 @@ export const SMMRapidPage: React.FC = () => {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {rapidMissions.map(rm => {
+          {(rapidMissions || []).map(rm => {
             const isEligible = user.level >= rm.requiredLevel;
             const slotsRemaining = rm.totalSlots - rm.claimedSlots;
 

@@ -1,58 +1,61 @@
 import React from 'react';
+import { motion } from 'motion/react';
 
 interface ProgressBarProps {
-  progress: number; // 0 - 100
+  progress: number; // 0 to 100
+  color?: 'purple' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'gradient';
+  height?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
   label?: string;
-  color?: 'gradient' | 'emerald' | 'amber' | 'rose' | 'cyan' | 'indigo';
-  height?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
-  showLabel = false,
-  label,
   color = 'gradient',
   height = 'md',
+  showLabel = false,
+  label,
   className = ''
 }) => {
-  const pct = Math.min(100, Math.max(0, Math.round(progress || 0)));
-
-  const heightClass = {
+  const heightClasses = {
     sm: 'h-1.5',
     md: 'h-2.5',
-    lg: 'h-3.5'
-  }[height];
+    lg: 'h-4'
+  };
 
-  const fillClass = {
-    gradient: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400',
-    emerald: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-    amber: 'bg-gradient-to-r from-amber-500 to-orange-400',
-    rose: 'bg-gradient-to-r from-rose-500 to-pink-400',
-    cyan: 'bg-gradient-to-r from-cyan-500 to-blue-400',
-    indigo: 'bg-gradient-to-r from-indigo-500 to-blue-500'
-  }[color];
+  const colorClasses = {
+    purple: 'bg-indigo-500 shadow-sm shadow-indigo-500/50',
+    cyan: 'bg-blue-400 shadow-sm shadow-blue-400/50',
+    emerald: 'bg-green-400 shadow-sm shadow-green-400/50',
+    amber: 'bg-orange-400 shadow-sm shadow-orange-400/50',
+    rose: 'bg-rose-500 shadow-sm shadow-rose-500/50',
+    gradient: 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(79,70,229,0.5)]'
+  };
+
+  const clampedProgress = Math.min(100, Math.max(0, progress));
 
   return (
-    <div className={`w-full ${className}`}>
+    <div 
+      className={`w-full ${className}`}
+      role="progressbar"
+      aria-valuenow={clampedProgress}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={label || 'Progress'}
+    >
       {(showLabel || label) && (
-        <div className="flex items-center justify-between mb-1.5 text-xs font-semibold">
-          <span className="text-slate-400">{label ?? 'Progress'}</span>
-          <span className="text-white tabular-nums">{pct}%</span>
+        <div className="flex justify-between items-center mb-1 text-xs font-semibold text-slate-300">
+          <span>{label || 'Progress'}</span>
+          <span>{clampedProgress}%</span>
         </div>
       )}
-      <div
-        role="progressbar"
-        aria-valuenow={pct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={label ?? 'Progress'}
-        className={`w-full ${heightClass} rounded-full bg-white/10 overflow-hidden border border-white/5`}
-      >
-        <div
-          className={`${heightClass} ${fillClass} rounded-full transition-[width] duration-500 ease-out`}
-          style={{ width: `${pct}%` }}
+      <div className={`w-full bg-slate-800/60 rounded-full overflow-hidden p-0.5 border border-white/10 ${heightClasses[height]}`}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${clampedProgress}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className={`h-full rounded-full ${colorClasses[color]}`}
         />
       </div>
     </div>

@@ -282,6 +282,7 @@ export const GamificationPage: React.FC = () => {
                 <option value="Gold">Gold</option>
                 <option value="Platinum">Platinum</option>
                 <option value="Diamond">Diamond</option>
+                <option value="Legendary">Legendary</option>
               </select>
             </div>
 

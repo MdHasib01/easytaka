@@ -206,7 +206,25 @@ export const SMMHomePage: React.FC = () => {
             <Badge variant="info">7 Days</Badge>
           </div>
 
-          <div className="h-56 w-full">
+          <div className="sr-only">
+            <table aria-label="Weekly Performance Analytics Data">
+              <thead>
+                <tr>
+                  <th scope="col">Day</th>
+                  <th scope="col">XP Tokens</th>
+                </tr>
+              </thead>
+              <tbody>
+                {smmWeeklyPerformanceData.map(data => (
+                  <tr key={data.day}>
+                    <td>{data.day}</td>
+                    <td>{data.xp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="h-56 w-full" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={smmWeeklyPerformanceData}>
                 <defs>
