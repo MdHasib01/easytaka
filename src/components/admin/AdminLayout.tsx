@@ -13,7 +13,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#05060A] text-slate-100 flex relative overflow-hidden">
+    <div className="h-screen w-screen bg-[#05060A] text-slate-100 flex relative overflow-hidden">
       {/* Geometric Balance ambient background lighting */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-indigo-600/20 rounded-full blur-[120px]" />
@@ -28,9 +28,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         onCloseMobile={() => setMobileOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 z-10">
+      <div className="flex-1 flex flex-col h-full min-w-0 z-10 overflow-hidden">
         <AdminHeader onToggleMobileMenu={() => setMobileOpen(true)} />
-        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-y-auto min-h-0">
           {children}
         </main>
       </div>

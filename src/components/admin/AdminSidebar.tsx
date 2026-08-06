@@ -64,8 +64,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
       <aside
         aria-label="Admin Navigation"
-        className={`fixed md:sticky top-0 left-0 z-50 h-screen shrink-0 flex flex-col
-          bg-slate-950/90 md:bg-white/[0.03] backdrop-blur-2xl border-r border-white/10
+        className={`fixed md:relative top-0 bottom-0 left-0 z-50 h-full shrink-0 flex flex-col
+          bg-slate-950/95 md:bg-white/[0.03] backdrop-blur-2xl border-r border-white/10
           transition-[transform,width] duration-300 ease-out
           w-64 ${width}
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}

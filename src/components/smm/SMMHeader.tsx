@@ -1,16 +1,30 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Bell, Flame, Sparkles, LogOut } from 'lucide-react';
+import { Bell, Flame, Sparkles, LogOut, Menu } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
-export const SMMHeader: React.FC = () => {
+interface SMMHeaderProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export const SMMHeader: React.FC<SMMHeaderProps> = ({ onToggleMobileMenu }) => {
   const { user, notifications } = useApp();
   const { logout } = useAuth();
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
     <header className="sticky top-0 z-30 h-16 shrink-0 flex items-center gap-3 px-3 sm:px-4 md:px-6 bg-slate-950/70 backdrop-blur-2xl border-b border-white/10">
+      {onToggleMobileMenu && (
+        <button
+          type="button"
+          onClick={onToggleMobileMenu}
+          aria-label="Open navigation menu"
+          className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
       <Link to="/smm/profile" className="flex items-center gap-2.5 min-w-0 group">
         <img
           src={user.avatar}
