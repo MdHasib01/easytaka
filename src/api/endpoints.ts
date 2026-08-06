@@ -1,4 +1,5 @@
 import { api, request } from './client';
+import { uploadImageToCloudinary } from '../utils/cloudinary';
 import type {
   AdminWeeklyPoint,
   AppNotification,
@@ -52,7 +53,27 @@ export const usersApi = {
   update: (id: string, body: Partial<SMMUser>) => api.patch<SMMUser>(`/users/${id}`, body),
   setStatus: (id: string, status: SMMUser['status']) => api.patch<SMMUser>(`/users/${id}/status`, { status }),
   resetPassword: (id: string) => api.post<{ tempPassword: string }>(`/users/${id}/reset-password`),
-  badges: (id: string) => api.get<BadgeItem[]>(`/users/${id}/badges`)
+  badges: (id: string) => api.get<BadgeItem[]>(`/users/${id}/badges`),
+  uploadAvatar: async (image: File | string, userId?: string) => {
+    try {
+      // Direct Cloudinary upload (works seamlessly on live & local backend)
+      const cloudinaryUrl = await uploadImageToCloudinary(image);
+      if (userId) {
+        const updatedUser = await api.patch<SMMUser>(`/users/${userId}`, { avatar: cloudinaryUrl });
+        return { url: cloudinaryUrl, user: updatedUser };
+      }
+      return { url: cloudinaryUrl };
+    } catch (cloudinaryErr) {
+      console.warn('Direct Cloudinary upload failed, trying server endpoint:', cloudinaryErr);
+      // Fallback to server endpoint if server supports /users/avatar
+      const imgStr = typeof image === 'string' ? image : await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(image);
+      });
+      return api.post<{ url: string; user?: SMMUser }>('/users/avatar', { image: imgStr });
+    }
+  }
 };
 
 export const brandsApi = {

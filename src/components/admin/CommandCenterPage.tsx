@@ -3,6 +3,7 @@ import { GlassCard } from '../common/GlassCard';
 import { AnimatedCounter } from '../common/AnimatedCounter';
 import { Badge } from '../common/Badge';
 import { ProgressBar } from '../common/ProgressBar';
+import { UserAvatar } from '../common/UserAvatar';
 import { useApp } from '../../context/AppContext';
 import { 
   Building2, 
@@ -296,7 +297,7 @@ export const CommandCenterPage: React.FC = () => {
               .map((w) => (
               <div key={w.id} className="p-3 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={w.avatar} alt={w.name} className="w-10 h-10 rounded-xl object-cover border border-white/20" />
+                  <UserAvatar src={w.avatar} name={w.name} size="sm" />
                   <div>
                     <h4 className="text-xs font-bold text-white">{w.name}</h4>
                     <p className="text-[10px] text-slate-400">{w.district} • Level {w.level} • {w.title}</p>

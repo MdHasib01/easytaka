@@ -3,6 +3,7 @@ import { GlassCard } from '../common/GlassCard';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { Tabs } from '../common/Tabs';
+import { UserAvatar } from '../common/UserAvatar';
 import { useApp } from '../../context/AppContext';
 import { Trophy, Award, Zap, Flame, Sparkles, Shield, Lock, CheckCircle2, Star, Calendar } from 'lucide-react';
 import { skillsApi } from '../../api/endpoints';
@@ -54,14 +55,17 @@ export const SMMCareerPage: React.FC = () => {
 
             <div className="flex flex-col md:flex-row items-center gap-6 border-b border-white/10 pb-6">
               <div className="relative">
-                <img
+                <UserAvatar
                   src={user.avatar}
-                  alt={user.name}
-                  className="w-20 h-20 rounded-3xl object-cover border-2 border-amber-400 shadow-xl"
+                  name={user.name}
+                  size="xl"
+                  badgeContent={
+                    <span className="bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded-full border border-white shadow-md">
+                      LVL {user.level}
+                    </span>
+                  }
+                  badgeClassName="-bottom-2 -right-2"
                 />
-                <span className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded-full border border-white">
-                  LVL {user.level}
-                </span>
               </div>
 
               <div className="text-center md:text-left space-y-1">

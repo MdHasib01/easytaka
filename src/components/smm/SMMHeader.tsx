@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Bell, Flame, Sparkles, LogOut, Menu } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface SMMHeaderProps {
   onToggleMobileMenu?: () => void;
@@ -26,10 +27,11 @@ export const SMMHeader: React.FC<SMMHeaderProps> = ({ onToggleMobileMenu }) => {
         </button>
       )}
       <Link to="/smm/profile" className="flex items-center gap-2.5 min-w-0 group">
-        <img
+        <UserAvatar
           src={user.avatar}
-          alt=""
-          className="w-9 h-9 rounded-xl object-cover border border-white/20 shrink-0 group-hover:border-cyan-400/60 transition-colors"
+          name={user.name}
+          size="sm"
+          className="group-hover:border-cyan-400/60 transition-colors"
         />
         <div className="min-w-0">
           <div className="text-sm font-bold text-white leading-tight truncate max-w-[150px]">

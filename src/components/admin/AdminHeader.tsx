@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, Search, Bell, ShieldCheck, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface AdminHeaderProps {
   onToggleMobileMenu: () => void;
@@ -49,11 +50,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleMobileMenu }) 
         </button>
 
         <div className="flex items-center gap-2.5 pl-2 sm:pl-3 sm:border-l border-white/10">
-          <img
-            src={user.avatar}
-            alt=""
-            className="w-9 h-9 rounded-xl object-cover border border-white/20 shrink-0"
-          />
+          <UserAvatar src={user.avatar} name={user.name} size="sm" />
           <div className="hidden sm:block min-w-0">
             <div className="text-sm font-bold text-white leading-tight truncate max-w-[140px]">
               {user.name}

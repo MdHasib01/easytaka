@@ -3,6 +3,7 @@ import { GlassCard } from '../common/GlassCard';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { Modal } from '../common/Modal';
+import { UserAvatar } from '../common/UserAvatar';
 import { useApp } from '../../context/AppContext';
 import { Users, Search, ShieldCheck, Sparkles, Filter, Phone, Mail, Plus, UserPlus, ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
 import { SMMUser } from '../../types';
@@ -149,14 +150,17 @@ export const WorkforcePage: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <img
+                  <UserAvatar
                     src={smm.avatar}
-                    alt={smm.name}
-                    className="w-12 h-12 rounded-2xl object-cover border-2 border-indigo-500/40"
+                    name={smm.name}
+                    size="md"
+                    badgeContent={
+                      <div className="bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.2 rounded-full border border-slate-900">
+                        L{smm.level}
+                      </div>
+                    }
+                    badgeClassName="-bottom-1 -right-1"
                   />
-                  <div className="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.2 rounded-full border border-slate-900">
-                    L{smm.level}
-                  </div>
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-1.5">
@@ -406,7 +410,7 @@ export const WorkforcePage: React.FC = () => {
         >
           <div className="space-y-4 text-xs">
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10">
-              <img src={selectedSMM.avatar} alt={selectedSMM.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-indigo-500" />
+              <UserAvatar src={selectedSMM.avatar} name={selectedSMM.name} size="lg" />
               <div>
                 <h3 className="text-base font-bold text-white">{selectedSMM.name}</h3>
                 <p className="text-indigo-300">{selectedSMM.title} • Level {selectedSMM.level}</p>

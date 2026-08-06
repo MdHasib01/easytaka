@@ -1,6 +1,7 @@
 import React from 'react';
 import { GlassCard } from './GlassCard';
 import { ProgressBar } from './ProgressBar';
+import { UserAvatar } from './UserAvatar';
 import { Sparkles, Zap, Award } from 'lucide-react';
 import { SMMUser } from '../../types';
 
@@ -21,17 +22,19 @@ export const LevelCard: React.FC<LevelCardProps> = ({ user, className = '' }) =>
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/30">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-full h-full object-cover rounded-[14px]"
-              />
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-xs px-2 py-0.5 rounded-full border border-white shadow-md flex items-center gap-0.5">
-              <Sparkles className="w-3 h-3 fill-slate-950" />
-              LVL {user.level}
-            </div>
+            <UserAvatar
+              src={user.avatar}
+              name={user.name}
+              size="lg"
+              className="shadow-lg shadow-purple-500/30"
+              badgeContent={
+                <div className="bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full border border-white shadow-md flex items-center gap-0.5 whitespace-nowrap">
+                  <Sparkles className="w-2.5 h-2.5 fill-slate-950" />
+                  LVL {user.level}
+                </div>
+              }
+              badgeClassName="-bottom-1 -right-1"
+            />
           </div>
 
           <div>
