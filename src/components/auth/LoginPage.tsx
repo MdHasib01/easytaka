@@ -68,7 +68,7 @@ export const LoginPage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-3xl font-black text-white">EasyTaka</h1>
-            <p className="text-sm text-slate-400">SMM Workforce Operations Platform</p>
+            <p className="text-sm text-slate-400">Earn Money Easily with Microjob</p>
           </div>
         </div>
 
