@@ -148,29 +148,27 @@ export const LoginPage: React.FC = () => {
           </form>
         </GlassCard>
 
-        {import.meta.env.DEV && (
-          <GlassCard className="space-y-2.5">
-            <div className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
-              Development accounts
-            </div>
-            <div className="space-y-1.5">
-              {DEV_ACCOUNTS.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => fillDevAccount(account)}
-                  className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
-                >
-                  <span className="text-xs font-bold text-white">{account.label}</span>
-                  <span className="text-[10px] font-mono text-slate-400 truncate">{account.email}</span>
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-500">
-              Click to fill the form. Seeded by <code className="text-slate-400">npm run seed</code>.
-            </p>
-          </GlassCard>
-        )}
+        <GlassCard className="space-y-2.5">
+          <div className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
+            Development accounts
+          </div>
+          <div className="space-y-1.5">
+            {DEV_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => fillDevAccount(account)}
+                className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+              >
+                <span className="text-xs font-bold text-white">{account.label}</span>
+                <span className="text-[10px] font-mono text-slate-400 truncate">{account.email}</span>
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-500">
+            Click to fill the form. Seeded by <code className="text-slate-400">npm run seed</code>.
+          </p>
+        </GlassCard>
       </div>
     </div>
   );
