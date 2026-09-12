@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSMM } from '../../contexts/SMMContext';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Progress } from '../../components/ui/Progress';
-import { Plus, Search, Filter, ShieldCheck, Facebook, Instagram, Lock, Unlock, X, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronRight, User, Image as ImageIcon, MessageSquare, Briefcase, FileText, Activity, Key, Star } from 'lucide-react';
+import { Plus, Search, Filter, ShieldCheck, Facebook, Instagram, Lock, Unlock, X, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronRight, User, Image as ImageIcon, MessageSquare, Briefcase, FileText, Activity, Key, Star, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { SocialAccount, Persona, Note } from '../../types';
+import { SocialAccount, Persona, Note, EnrichmentStage } from '../../types';
 import { ProofSubmission } from '../../components/ProofSubmission';
+import { ImageCropModal, CroppedImageResult } from '../../components/common/ImageCropModal';
 
 
 function EnrichmentTab({ account, onSubmitStage }: { account: SocialAccount, onSubmitStage: (stageId: string, proofData?: any) => void }) {
@@ -382,6 +383,31 @@ function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: S
   const tabs = ['Overview', 'Persona', 'Enrichment', 'Notes', 'Account Access', 'Tasks'];
   const [showHistory, setShowHistory] = useState(false);
 
+  // Persona avatar zoom & adjust state
+  const [personaAvatar, setPersonaAvatar] = useState(account.persona?.avatar || '');
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const personaFileRef = useRef<HTMLInputElement>(null);
+
+  const handlePersonaFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    const reader = new FileReader();
+    reader.onload = () => {
+      setRawImageSrc(reader.result as string);
+      setCropModalOpen(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = (result: CroppedImageResult) => {
+    setPersonaAvatar(result.dataUrl);
+    if (account.persona) {
+      account.persona.avatar = result.dataUrl;
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -399,8 +425,8 @@ function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: S
         <div className="flex justify-between items-center p-4 md:p-6 border-b border-white/5 bg-slate-900/50 backdrop-blur-xl z-20 shrink-0">
           <div className="flex items-center gap-4">
              <div className="relative">
-               {account.persona?.avatar ? (
-                 <img src={account.persona.avatar} alt="Profile" className="w-12 h-12 rounded-full object-cover border-2 border-slate-700" />
+               {(personaAvatar || account.persona?.avatar) ? (
+                 <img src={personaAvatar || account.persona?.avatar} alt="Profile" className="w-12 h-12 rounded-full object-cover border-2 border-slate-700" />
                ) : (
                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border-2 border-slate-700">
                    <User className="w-6 h-6 text-slate-500" />
@@ -544,25 +570,42 @@ function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: S
                 )}
 
                 <div className="bg-slate-900 rounded-2xl border border-white/5 p-6 space-y-8">
-                   {/* Photos */}
-                   <div>
+                   {/* Photo                    <div>
                       <h4 className="text-sm font-medium text-slate-400 mb-4 uppercase tracking-wider">Visual Identity</h4>
                       <div className="flex flex-col sm:flex-row gap-6">
                          <div className="space-y-2 text-center">
                             <div className="w-24 h-24 rounded-full bg-slate-800 border-2 border-dashed border-slate-600 flex items-center justify-center mx-auto overflow-hidden relative group">
-                               {account.persona?.avatar ? (
+                               {(personaAvatar || account.persona?.avatar) ? (
                                   <>
-                                    <img src={account.persona.avatar} alt="Profile" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                       <ImageIcon className="w-6 h-6 text-white" />
+                                    <img src={personaAvatar || account.persona?.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                    <div
+                                      onClick={() => personaFileRef.current?.click()}
+                                      className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                                    >
+                                       <Camera className="w-6 h-6 text-white" />
                                     </div>
                                   </>
                                ) : (
                                   <ImageIcon className="w-8 h-8 text-slate-500" />
                                )}
                             </div>
-                            <Button size="sm" variant="outline" className="text-xs">Upload Profile</Button>
-                         </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => personaFileRef.current?.click()}
+                              className="text-xs"
+                            >
+                              Upload Profile
+                            </Button>
+                            <input
+                              ref={personaFileRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handlePersonaFileSelect}
+                              className="hidden"
+                            />
+                         </div></div>
                          <div className="space-y-2 flex-1">
                             <div className="h-24 rounded-xl bg-slate-800 border-2 border-dashed border-slate-600 flex items-center justify-center overflow-hidden relative group">
                                {account.persona?.coverPhoto ? (
@@ -799,6 +842,13 @@ function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: S
         )}
       </AnimatePresence>
 
+      <ImageCropModal
+        open={cropModalOpen}
+        imageSrc={rawImageSrc}
+        onClose={() => setCropModalOpen(false)}
+        onCropComplete={handleCropComplete}
+        title="Adjust Persona Avatar"
+      />
     </motion.div>
     </motion.div>
   );

@@ -30,7 +30,10 @@ export default function Login() {
   };
 
   return (
-    <AuthShell title="Welcome back" subtitle="Log in to your EasyTaka account.">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Log in to your EasyTaka account."
+    >
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Email">
           <Input
@@ -61,8 +64,11 @@ export default function Login() {
       </form>
 
       <p className="text-sm text-slate-400 text-center mt-6">
-        Want to work as an SMM?{' '}
-        <Link to="/register" className="text-indigo-300 hover:text-indigo-200 font-medium">
+        Don&apos;t have an account?{' '}
+        <Link
+          to="/register"
+          className="text-indigo-300 hover:text-indigo-200 font-medium"
+        >
           Create an account
         </Link>
       </p>

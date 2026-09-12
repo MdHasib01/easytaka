@@ -18,16 +18,16 @@ export function ReviewCenterTab() {
       .map(stage => ({ account: acc, stage }))
   );
   
-  const handleApprove = (accountId, stageId) => {
+  const handleApprove = (accountId: string, stageId: string) => {
     simulateReview(accountId, stageId, 'Approve');
     setSelectedReviewItem(null);
   };
-  const handleRevision = (accountId, stageId, note) => {
-    simulateReview(accountId, stageId, 'Revision', note || 'Please update the requested fields.');
+  const handleRevision = (accountId: string, stageId: string, note: string = 'Please update the requested fields.') => {
+    simulateReview(accountId, stageId, 'Revision', note);
     setSelectedReviewItem(null);
   };
-  const handleReject = (accountId, stageId, note) => {
-    simulateReview(accountId, stageId, 'Reject', note || 'Stage rejected. Please restart.');
+  const handleReject = (accountId: string, stageId: string, note: string = 'Stage rejected. Please restart.') => {
+    simulateReview(accountId, stageId, 'Reject', note);
     setSelectedReviewItem(null);
   };
 

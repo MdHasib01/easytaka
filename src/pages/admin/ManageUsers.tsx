@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { ExternalLink, IdCard, Loader2, Plus, Search, ShieldCheck, UserX, UserCheck } from 'lucide-react';
+import { ExternalLink, IdCard, Loader2, Plus, Search, ShieldCheck, UserX, UserCheck, Pencil } from 'lucide-react';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { BrandLogo } from '../../components/BrandLogo';
@@ -7,8 +7,10 @@ import { Field, FormError, Input, Select, Textarea } from '../../components/ui/F
 import { Modal } from '../../components/ui/Modal';
 import { useAuth } from '../../contexts/AuthContext';
 import { api, errorMessage } from '../../lib/api';
-import { initials, ROLE_LABELS } from '../../lib/auth';
+import { ROLE_LABELS } from '../../lib/auth';
 import { cn } from '../../lib/utils';
+import { UserAvatar } from '../../components/common/UserAvatar';
+import { EditProfileModal } from '../../components/common/EditProfileModal';
 import type { AdminBrand, ManagedUser, NidDetails, Role, Verification, VerificationStatus } from '../../types';
 
 const VERIFICATION_VARIANT: Record<VerificationStatus, 'warning' | 'success' | 'error'> = {
@@ -302,6 +304,7 @@ export default function ManageUsers() {
   const [pendingCount, setPendingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [editingUser, setEditingUser] = useState<ManagedUser | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -479,9 +482,7 @@ export default function ManageUsers() {
                 <tr key={user.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-900/60 text-indigo-300 flex items-center justify-center text-xs font-bold shrink-0">
-                        {initials(user.name)}
-                      </div>
+                      <UserAvatar src={user.avatar} name={user.name} size="sm" />
                       <div className="min-w-0">
                         <p className="font-medium text-slate-100 truncate">
                           {user.name} {isSelf && <span className="text-xs text-slate-500">(you)</span>}
@@ -511,6 +512,9 @@ export default function ManageUsers() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setEditingUser(user)}>
+                        <Pencil className="w-4 h-4 mr-1.5" /> Edit Profile
+                      </Button>
                       {user.smm?.hasNid && (
                         <Button size="sm" variant="outline" onClick={() => setReviewingId(user.id)}>
                           <IdCard className="w-4 h-4 mr-1.5" /> Review NID
@@ -550,6 +554,18 @@ export default function ManageUsers() {
         onCreated={(user) => setUsers((list) => (list ? [user, ...list] : [user]))}
       />
       <NidReviewModal userId={reviewingId} onClose={() => setReviewingId(null)} onReviewed={onReviewed} />
+      {editingUser && (
+        <EditProfileModal
+          open={Boolean(editingUser)}
+          onClose={() => setEditingUser(null)}
+          user={editingUser}
+          isSelf={editingUser.id === session?.user.id}
+          onSaved={(updated) => {
+            replaceUser(updated);
+            setEditingUser(null);
+          }}
+        />
+      )}
     </div>
   );
 }

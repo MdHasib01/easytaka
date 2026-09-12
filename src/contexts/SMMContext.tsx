@@ -251,15 +251,17 @@ export function SMMProvider({ children }: { children: ReactNode }) {
       status: 'Enrichment Started', // Based on the wizard flow, it goes straight to enrichment started
       enrichmentPercent: 0,
       approvalStatus: null,
+      todayTasksCompleted: 0,
+      todayTasksTotal: 0,
       todayCompletionPercent: 0,
       assignedProductCount: 0,
       lastActivity: 'Just now',
       stages: [
-        { id: 'st1', name: 'Profile Foundation', status: 'Available', xpReward: 40 },
-        { id: 'st2', name: 'Profile Completeness', status: 'Locked', xpReward: 40 },
-        { id: 'st3', name: 'Content Foundation', status: 'Locked', xpReward: 40 },
-        { id: 'st4', name: 'Organic Activity', status: 'Locked', xpReward: 40 },
-        { id: 'st5', name: 'Final Eligibility Review', status: 'Locked', xpReward: 40 },
+        { id: 'st1', name: 'Profile Foundation', status: 'Available', xpReward: 40, weight: 20, checklist: [] },
+        { id: 'st2', name: 'Profile Completeness', status: 'Locked', xpReward: 40, weight: 20, checklist: [] },
+        { id: 'st3', name: 'Content Foundation', status: 'Locked', xpReward: 40, weight: 20, checklist: [] },
+        { id: 'st4', name: 'Organic Activity', status: 'Locked', xpReward: 40, weight: 20, checklist: [] },
+        { id: 'st5', name: 'Final Eligibility Review', status: 'Locked', xpReward: 40, weight: 20, checklist: [] },
       ]
     };
     setAccounts([acc, ...accounts]);

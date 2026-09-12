@@ -11,6 +11,7 @@ import { Building2, Package, Users, CheckSquare, Zap, ShieldCheck, UserCheck, Us
 import AdminBrands from './Brands';
 import AdminManageUsers from './ManageUsers';
 import { BrandLogo } from '../../components/BrandLogo';
+import logoImg from '../../assets/logo.png';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BrandDetailsTab } from './tabs/BrandDetailsTab';
 import { ProductsTab } from './tabs/ProductsTab';
@@ -122,8 +123,8 @@ export default function BrandDashboard({ scope = 'brand' }: { scope?: WorkspaceS
           onClick={onHeaderClick}
         >
           {isPlatform ? (
-            <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-xl border border-white/10 shadow-inner shrink-0 group-hover:border-indigo-500/50 transition-colors">
-              <Globe2 className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 bg-slate-850 rounded-xl flex items-center justify-center p-1.5 border border-white/10 shadow-inner shrink-0 group-hover:border-indigo-500/50 transition-colors">
+              <img src={logoImg} alt="EasyTaka" className="w-full h-full object-contain drop-shadow-[0_2px_6px_rgba(99,102,241,0.3)]" />
             </div>
           ) : (
             <BrandLogo logo={brand.logo} className="w-10 h-10 text-xl rounded-xl shrink-0 group-hover:border-indigo-500/50 transition-colors" />
@@ -237,13 +238,17 @@ export default function BrandDashboard({ scope = 'brand' }: { scope?: WorkspaceS
               </button>
               
               <div className="flex items-center gap-2.5 text-sm min-w-0">
-                {!isPlatform && (
+                {isPlatform ? (
+                  <div className="w-8 h-8 rounded-lg bg-slate-800/90 border border-white/10 p-1 shrink-0 flex items-center justify-center shadow-sm">
+                    <img src={logoImg} alt="EasyTaka" className="w-full h-full object-contain" />
+                  </div>
+                ) : (
                   <BrandLogo logo={brand.logo} className="w-8 h-8 rounded-lg shrink-0 shadow-sm border border-white/10" />
                 )}
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold text-slate-200 truncate">{isPlatform ? 'All Brands' : brand.name}</span>
+                  <span className="font-semibold text-slate-200 truncate">{isPlatform ? 'EasyTaka' : brand.name}</span>
                   <span className="text-slate-600 hidden sm:inline">/</span>
-                  <span className="text-indigo-300 font-medium tracking-wide hidden sm:inline">{isPlatform ? 'Admin Workspace' : 'Brand Workspace'}</span>
+                  <span className="text-indigo-300 font-medium tracking-wide hidden sm:inline">{isPlatform ? 'Platform Admin' : 'Brand Workspace'}</span>
                 </div>
               </div>
 

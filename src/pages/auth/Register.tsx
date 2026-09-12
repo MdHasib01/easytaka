@@ -1,24 +1,35 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { IdCard, ImagePlus, Loader2, X } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Building2, IdCard, ImagePlus, Loader2, Users, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Field, FormError, Input, Select } from '../../components/ui/Form';
 import { useAuth } from '../../contexts/AuthContext';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../lib/api';
+import { homePathFor } from '../../lib/auth';
 import { DIVISIONS, NID_IMAGE_MAX_BYTES, NID_IMAGE_TYPES, NID_NUMBER_PATTERN } from '../../lib/constants';
-import type { BrandSummary } from '../../types';
+import { cn } from '../../lib/utils';
 import { AuthShell } from './AuthShell';
 
-const EMPTY = {
+type RoleTab = 'MANAGER' | 'SMM';
+
+const EMPTY_SMM = {
   name: '',
   email: '',
   phone: '',
   password: '',
   confirmPassword: '',
-  brandId: '',
   nidNumber: '',
   nidDivision: '',
   assignedWorkingDivision: '',
+};
+
+const EMPTY_BRAND_ADMIN = {
+  name: '',
+  email: '',
+  phone: '',
+  brandName: '',
+  password: '',
+  confirmPassword: '',
 };
 
 function NidImagePicker({
@@ -89,29 +100,46 @@ function NidImagePicker({
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState(EMPTY);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const roleParam = searchParams.get('role')?.toLowerCase();
+  const initialRole: RoleTab = roleParam === 'brand' || roleParam === 'manager' || roleParam === 'admin' ? 'MANAGER' : 'SMM';
+
+  const [role, setRole] = useState<RoleTab>(initialRole);
+  const [smmForm, setSmmForm] = useState(EMPTY_SMM);
+  const [brandForm, setBrandForm] = useState(EMPTY_BRAND_ADMIN);
   const [nidFront, setNidFront] = useState<File | null>(null);
   const [nidBack, setNidBack] = useState<File | null>(null);
-  const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    api<BrandSummary[]>('/brands/public')
-      .then(setBrands)
-      .catch((err) => setError(errorMessage(err)));
-  }, []);
+  const handleTabChange = (newRole: RoleTab) => {
+    setRole(newRole);
+    setError(null);
+    setSearchParams({ role: newRole === 'MANAGER' ? 'brand' : 'smm' });
+  };
 
-  const set = (key: keyof typeof EMPTY) => (e: { target: { value: string } }) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }));
+  const setSmm = (key: keyof typeof EMPTY_SMM) => (e: { target: { value: string } }) =>
+    setSmmForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const setBrand = (key: keyof typeof EMPTY_BRAND_ADMIN) => (e: { target: { value: string } }) =>
+    setBrandForm((f) => ({ ...f, [key]: e.target.value }));
 
   const validate = (): string | null => {
-    if (form.password.length < 6) return 'Password must be at least 6 characters';
-    if (form.password !== form.confirmPassword) return 'Passwords do not match';
-    if (!form.brandId) return 'Choose the brand you want to work for';
-    if (!NID_NUMBER_PATTERN.test(form.nidNumber.trim())) return 'NID number must be 10, 13 or 17 digits';
-    if (!form.nidDivision) return 'Choose the division printed on your NID';
-    if (form.assignedWorkingDivision && form.assignedWorkingDivision === form.nidDivision) {
+    if (role === 'MANAGER') {
+      if (brandForm.name.trim().length < 2) return 'Please enter your full name';
+      if (brandForm.password.length < 6) return 'Password must be at least 6 characters';
+      if (brandForm.password !== brandForm.confirmPassword) return 'Passwords do not match';
+      return null;
+    }
+
+    // SMM validation
+    if (smmForm.name.trim().length < 2) return 'Please enter your full name';
+    if (smmForm.password.length < 6) return 'Password must be at least 6 characters';
+    if (smmForm.password !== smmForm.confirmPassword) return 'Passwords do not match';
+    if (!NID_NUMBER_PATTERN.test(smmForm.nidNumber.trim())) return 'NID number must be 10, 13 or 17 digits';
+    if (!smmForm.nidDivision) return 'Choose the division printed on your NID';
+    if (smmForm.assignedWorkingDivision && smmForm.assignedWorkingDivision === smmForm.nidDivision) {
       return 'Working division must be different from your NID division';
     }
     if (!nidFront || !nidBack) return 'Upload photos of both the front and back of your NID';
@@ -124,19 +152,33 @@ export default function Register() {
     setError(problem);
     if (problem) return;
 
-    const body = new FormData();
-    const { confirmPassword: _confirm, ...fields } = form;
-    for (const [key, value] of Object.entries(fields) as [string, string][]) {
-      if (value.trim()) body.append(key, value.trim());
-    }
-    body.set('password', form.password);
-    body.append('nidFront', nidFront!);
-    body.append('nidBack', nidBack!);
-
     setSubmitting(true);
     try {
-      await register(body);
-      navigate('/verification', { replace: true });
+      if (role === 'MANAGER') {
+        const payload = {
+          role: 'MANAGER',
+          name: brandForm.name.trim(),
+          email: brandForm.email.trim(),
+          phone: brandForm.phone.trim() || undefined,
+          brandName: brandForm.brandName.trim() || undefined,
+          password: brandForm.password,
+        };
+        const session = await register(payload);
+        navigate(homePathFor(session), { replace: true });
+      } else {
+        const body = new FormData();
+        body.append('role', 'SMM');
+        const { confirmPassword: _confirm, ...fields } = smmForm;
+        for (const [key, value] of Object.entries(fields) as [string, string][]) {
+          if (value.trim()) body.append(key, value.trim());
+        }
+        body.set('password', smmForm.password);
+        body.append('nidFront', nidFront!);
+        body.append('nidBack', nidBack!);
+
+        await register(body);
+        navigate('/verification', { replace: true });
+      }
     } catch (err) {
       setError(errorMessage(err));
       setSubmitting(false);
@@ -148,90 +190,194 @@ export default function Register() {
     setError(problem ?? null);
   };
 
+  const isBrandAdmin = role === 'MANAGER';
+
   return (
     <AuthShell
-      wide
-      title="Create your SMM account"
-      subtitle="Your National ID is checked by an admin before your workspace is unlocked."
+      wide={!isBrandAdmin}
+      title={isBrandAdmin ? 'Create Brand Admin account' : 'Create your SMM account'}
+      subtitle={
+        isBrandAdmin
+          ? 'Set up your workspace to manage your brand, products, missions, and workforce.'
+          : 'Your National ID is checked by an admin before your workspace is unlocked.'
+      }
     >
-      <form onSubmit={onSubmit} className="space-y-8">
-        <section className="space-y-4">
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Account</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" required>
-              <Input required minLength={2} value={form.name} onChange={set('name')} autoComplete="name" />
-            </Field>
-            <Field label="Phone">
-              <Input type="tel" value={form.phone} onChange={set('phone')} placeholder="+8801…" autoComplete="tel" />
-            </Field>
-            <Field label="Email" required className="sm:col-span-2">
-              <Input type="email" required value={form.email} onChange={set('email')} autoComplete="email" />
-            </Field>
-            <Field label="Password" required hint="At least 6 characters">
-              <Input type="password" required value={form.password} onChange={set('password')} autoComplete="new-password" />
-            </Field>
-            <Field label="Confirm password" required>
-              <Input
-                type="password"
-                required
-                value={form.confirmPassword}
-                onChange={set('confirmPassword')}
-                autoComplete="new-password"
-              />
-            </Field>
-            <Field label="Brand" required className="sm:col-span-2">
-              <Select required value={form.brandId} onChange={set('brandId')}>
-                <option value="">Select a brand…</option>
-                {brands.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.logo} {b.name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </div>
-        </section>
+      {/* Role Selection Tabs */}
+      <div className="grid grid-cols-2 p-1 bg-slate-900/80 border border-white/10 rounded-xl mb-8 shadow-inner">
+        <button
+          type="button"
+          onClick={() => handleTabChange('MANAGER')}
+          className={cn(
+            'py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2',
+            isBrandAdmin
+              ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md shadow-indigo-500/30'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
+          )}
+        >
+          <Building2 className="w-4 h-4" />
+          Brand Admin
+        </button>
+        <button
+          type="button"
+          onClick={() => handleTabChange('SMM')}
+          className={cn(
+            'py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2',
+            !isBrandAdmin
+              ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md shadow-indigo-500/30'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
+          )}
+        >
+          <Users className="w-4 h-4" />
+          SMM
+        </button>
+      </div>
 
-        <section className="space-y-4">
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-            <IdCard className="w-4 h-4" /> National ID verification
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="NID number" required hint="10, 13 or 17 digits" className="sm:col-span-2">
-              <Input
-                required
-                inputMode="numeric"
-                value={form.nidNumber}
-                onChange={set('nidNumber')}
-                placeholder="e.g. 1234567890"
-              />
-            </Field>
-            <Field label="NID division" required hint="As printed on your NID">
-              <Select required value={form.nidDivision} onChange={set('nidDivision')}>
-                <option value="">Select…</option>
-                {DIVISIONS.map((d) => (
-                  <option key={d}>{d}</option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Preferred working division" hint="Must differ from your NID division">
-              <Select value={form.assignedWorkingDivision} onChange={set('assignedWorkingDivision')}>
-                <option value="">No preference</option>
-                {DIVISIONS.filter((d) => d !== form.nidDivision).map((d) => (
-                  <option key={d}>{d}</option>
-                ))}
-              </Select>
-            </Field>
-            <NidImagePicker label="NID front" file={nidFront} onChange={onImage(setNidFront)} />
-            <NidImagePicker label="NID back" file={nidBack} onChange={onImage(setNidBack)} />
-          </div>
-        </section>
+      <form onSubmit={onSubmit} className="space-y-8">
+        {isBrandAdmin ? (
+          /* Brand Admin Registration Form */
+          <section className="space-y-4">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Brand Admin Details</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Full name" required>
+                <Input
+                  required
+                  minLength={2}
+                  value={brandForm.name}
+                  onChange={setBrand('name')}
+                  autoComplete="name"
+                  placeholder="e.g. Sarah Jenkins"
+                />
+              </Field>
+              <Field label="Phone">
+                <Input
+                  type="tel"
+                  value={brandForm.phone}
+                  onChange={setBrand('phone')}
+                  placeholder="+8801…"
+                  autoComplete="tel"
+                />
+              </Field>
+              <Field label="Work email" required className="sm:col-span-2">
+                <Input
+                  type="email"
+                  required
+                  value={brandForm.email}
+                  onChange={setBrand('email')}
+                  autoComplete="email"
+                  placeholder="admin@brand.com"
+                />
+              </Field>
+              <Field label="Brand / Company name" hint="Optional" className="sm:col-span-2">
+                <Input
+                  value={brandForm.brandName}
+                  onChange={setBrand('brandName')}
+                  placeholder="e.g. Apex Lifestyle"
+                />
+              </Field>
+              <Field label="Password" required hint="At least 6 characters">
+                <Input
+                  type="password"
+                  required
+                  value={brandForm.password}
+                  onChange={setBrand('password')}
+                  autoComplete="new-password"
+                />
+              </Field>
+              <Field label="Confirm password" required>
+                <Input
+                  type="password"
+                  required
+                  value={brandForm.confirmPassword}
+                  onChange={setBrand('confirmPassword')}
+                  autoComplete="new-password"
+                />
+              </Field>
+            </div>
+          </section>
+        ) : (
+          /* SMM Registration Form */
+          <>
+            <section className="space-y-4">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Account</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Full name" required>
+                  <Input required minLength={2} value={smmForm.name} onChange={setSmm('name')} autoComplete="name" />
+                </Field>
+                <Field label="Phone">
+                  <Input type="tel" value={smmForm.phone} onChange={setSmm('phone')} placeholder="+8801…" autoComplete="tel" />
+                </Field>
+                <Field label="Email" required className="sm:col-span-2">
+                  <Input type="email" required value={smmForm.email} onChange={setSmm('email')} autoComplete="email" />
+                </Field>
+                <Field label="Password" required hint="At least 6 characters">
+                  <Input
+                    type="password"
+                    required
+                    value={smmForm.password}
+                    onChange={setSmm('password')}
+                    autoComplete="new-password"
+                  />
+                </Field>
+                <Field label="Confirm password" required>
+                  <Input
+                    type="password"
+                    required
+                    value={smmForm.confirmPassword}
+                    onChange={setSmm('confirmPassword')}
+                    autoComplete="new-password"
+                  />
+                </Field>
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                <IdCard className="w-4 h-4" /> National ID verification
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="NID number" required hint="10, 13 or 17 digits" className="sm:col-span-2">
+                  <Input
+                    required
+                    inputMode="numeric"
+                    value={smmForm.nidNumber}
+                    onChange={setSmm('nidNumber')}
+                    placeholder="e.g. 1234567890"
+                  />
+                </Field>
+                <Field label="NID division" required hint="As printed on your NID">
+                  <Select required value={smmForm.nidDivision} onChange={setSmm('nidDivision')}>
+                    <option value="">Select…</option>
+                    {DIVISIONS.map((d) => (
+                      <option key={d}>{d}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="Preferred working division" hint="Must differ from your NID division">
+                  <Select value={smmForm.assignedWorkingDivision} onChange={setSmm('assignedWorkingDivision')}>
+                    <option value="">No preference</option>
+                    {DIVISIONS.filter((d) => d !== smmForm.nidDivision).map((d) => (
+                      <option key={d}>{d}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <NidImagePicker label="NID front" file={nidFront} onChange={onImage(setNidFront)} />
+                <NidImagePicker label="NID back" file={nidBack} onChange={onImage(setNidBack)} />
+              </div>
+            </section>
+          </>
+        )}
 
         <FormError message={error} />
 
         <Button type="submit" className="w-full" disabled={submitting}>
           {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {submitting ? 'Uploading NID…' : 'Create account'}
+          {submitting
+            ? isBrandAdmin
+              ? 'Creating account…'
+              : 'Uploading NID…'
+            : isBrandAdmin
+              ? 'Create Brand Admin account'
+              : 'Create SMM account'}
         </Button>
       </form>
 

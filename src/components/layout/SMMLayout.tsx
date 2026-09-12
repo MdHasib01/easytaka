@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { UserMenu } from './UserMenu';
-import { Home, Layers, CalendarCheck, Zap, MessageSquare, Trophy, Gift, Wallet, Bell, Menu, LogOut } from 'lucide-react';
+import { Home, Layers, CalendarCheck, Zap, MessageSquare, Trophy, Gift, Wallet, Bell, Menu, LogOut, UserCog } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion } from 'motion/react';
 import { DemoControls } from '../../pages/smm/DemoControls';
 import { useSMM } from '../../contexts/SMMContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { initials } from '../../lib/auth';
 import { AnimatePresence } from 'motion/react';
+import { AppLogo } from '../AppLogo';
+import { UserAvatar } from '../common/UserAvatar';
+import logoImg from '../../assets/logo.png';
 
 export function SMMLayout() {
   const navigate = useNavigate();
@@ -48,12 +51,7 @@ export function SMMLayout() {
         {/* Mobile Top Header */}
         <header className="sticky top-0 z-50 bg-[#0B0F19]/80 backdrop-blur-xl border-b border-white/10 md:hidden">
           <div className="px-4 h-16 flex items-center justify-between relative z-10">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-[0_0_10px_rgba(79,70,229,0.5)]">
-                {initials(userName)}
-              </div>
-              <span className="font-semibold text-slate-200">{userName}</span>
-            </div>
+            <AppLogo size="sm" href="/smm/home" />
             <div className="flex items-center gap-3">
                <button className="relative text-slate-400 hover:text-white transition-colors">
                   <Bell className="w-5 h-5" />
@@ -67,7 +65,7 @@ export function SMMLayout() {
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-64 flex-col bg-[#0B0F19]/95 backdrop-blur-xl border-r border-white/10">
           <div className="h-16 px-6 flex items-center border-b border-white/10">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent tracking-tight">EASYTAKA</h1>
+            <AppLogo size="md" href="/smm/home" />
           </div>
 
           <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
@@ -97,20 +95,36 @@ export function SMMLayout() {
             ))}
           </nav>
 
-          <div className="p-4 border-t border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/10 shadow-[0_0_15px_rgba(79,70,229,0.3)] shrink-0">
-              <div className="w-full h-full bg-indigo-900 flex items-center justify-center text-indigo-300 font-bold text-sm">
-                {initials(userName)}
+          <div className="p-3 border-t border-white/10 flex items-center gap-2.5">
+            <div
+              onClick={() => navigate('/smm/profile')}
+              className="cursor-pointer group flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+              title="Click to edit profile"
+            >
+              <UserAvatar
+                src={session?.user.avatar}
+                name={userName}
+                size="sm"
+                className="group-hover:ring-indigo-400 transition-all"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-200 truncate group-hover:text-indigo-300 transition-colors">
+                  {userName}
+                </p>
+                <p className="text-xs text-slate-500 truncate">{session?.brand?.name ?? 'SMM Workspace'}</p>
               </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-200 truncate">{userName}</p>
-              <p className="text-xs text-slate-500 truncate">{session?.brand?.name ?? 'SMM Workspace'}</p>
-            </div>
+            <button
+              onClick={() => navigate('/smm/profile')}
+              title="Edit profile"
+              className="p-1.5 text-slate-500 hover:text-indigo-300 hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+            >
+              <UserCog className="w-4 h-4" />
+            </button>
             <button
               onClick={handleLogout}
               title="Log out"
-              className="p-2 text-slate-500 hover:text-rose-300 hover:bg-white/5 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 hover:text-rose-300 hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -120,7 +134,10 @@ export function SMMLayout() {
         {/* Desktop Top Bar */}
         <header className="sticky top-0 z-40 bg-[#0B0F19]/80 backdrop-blur-xl border-b border-white/10 hidden md:block">
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative z-10">
-            <span className="text-sm font-medium text-indigo-300 tracking-wide">SMM Workspace</span>
+            <div className="flex items-center gap-2.5">
+              <img src={logoImg} alt="EasyTaka" className="w-5 h-5 object-contain" />
+              <span className="text-sm font-medium text-indigo-300 tracking-wide">SMM Workspace</span>
+            </div>
             <div className="flex items-center gap-4">
               <button className="relative text-slate-400 hover:text-white transition-colors">
                 <Bell className="w-5 h-5" />

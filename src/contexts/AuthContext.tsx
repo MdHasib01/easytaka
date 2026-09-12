@@ -10,7 +10,7 @@ interface AuthValue {
   /** True while a platform admin is logged in as a brand and can switch back. */
   canReturnToAdmin: boolean;
   login(email: string, password: string): Promise<AuthSession>;
-  register(form: FormData): Promise<AuthSession>;
+  register(form: FormData | Record<string, any>): Promise<AuthSession>;
   logout(): void;
   loginAsBrand(brandId: string): Promise<AuthSession>;
   returnToAdmin(): Promise<AuthSession | null>;

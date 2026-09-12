@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, UserCog } from 'lucide-react';
 import { mockSMMs, mockProducts } from '../../../data/mockData';
+import { UserAvatar } from '../../../components/common/UserAvatar';
+import { EditProfileModal } from '../../../components/common/EditProfileModal';
+import type { SMM } from '../../../types';
 
 export function WorkforceTab() {
+  const [smms, setSmms] = useState<SMM[]>(mockSMMs);
+  const [selectedSmm, setSelectedSmm] = useState<SMM | null>(null);
+
+  const handleSmmSaved = (updated: any) => {
+    if (!selectedSmm) return;
+    setSmms((prev) =>
+      prev.map((s) =>
+        s.id === selectedSmm.id
+          ? {
+              ...s,
+              name: updated.name || s.name,
+              avatar: updated.avatar || s.avatar,
+            }
+          : s
+      )
+    );
+  };
+
   return (
     <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -34,23 +55,28 @@ export function WorkforceTab() {
               <tr>
                 <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">SMM Profile</th>
                 <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Division Constraint</th>
-                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Products ({mockSMMs[0].assignedProductIds.length}/4)</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Products ({smms[0]?.assignedProductIds.length || 0}/4)</th>
                 <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Hub Progress</th>
                 <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Quality & Level</th>
                 <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {mockSMMs.map(smm => {
+              {smms.map(smm => {
                  const isDivisionValid = smm.nidDivision !== smm.assignedWorkingDivision;
+                 const isAvatarUrl = smm.avatar && (smm.avatar.startsWith('http') || smm.avatar.startsWith('data:image'));
                  
                  return (
                 <tr key={smm.id} className="hover:bg-slate-800/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg border border-white/10 shadow-inner">
-                        {smm.avatar}
-                      </div>
+                      {isAvatarUrl ? (
+                        <UserAvatar src={smm.avatar} name={smm.name} size="md" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg border border-white/10 shadow-inner">
+                          {smm.avatar}
+                        </div>
+                      )}
                       <div>
                         <div className="font-semibold text-slate-200">{smm.name}</div>
                         <div className="text-xs text-slate-500">{smm.role}</div>
@@ -100,7 +126,15 @@ export function WorkforceTab() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Button size="sm" variant="secondary" className="bg-slate-800 hover:bg-slate-700">Open Profile</Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setSelectedSmm(smm)}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white"
+                    >
+                      <UserCog className="w-3.5 h-3.5 mr-1.5 text-indigo-400" />
+                      Edit Profile
+                    </Button>
                   </td>
                 </tr>
               )})}
@@ -108,6 +142,32 @@ export function WorkforceTab() {
           </table>
         </div>
       </Card>
+
+      {selectedSmm && (
+        <EditProfileModal
+          open={Boolean(selectedSmm)}
+          onClose={() => setSelectedSmm(null)}
+          user={{
+            id: selectedSmm.id,
+            name: selectedSmm.name,
+            email: `${selectedSmm.name.toLowerCase().replace(/\s+/g, '.')}@easytaka.com`,
+            phone: '+880 1712-345678',
+            avatar: selectedSmm.avatar.startsWith('http') || selectedSmm.avatar.startsWith('data:') ? selectedSmm.avatar : undefined,
+            role: 'SMM',
+            brand: { name: 'Milkimom' },
+            smm: {
+              id: selectedSmm.id,
+              nidDivision: selectedSmm.nidDivision,
+              assignedWorkingDivision: selectedSmm.assignedWorkingDivision,
+              verification: { status: 'Verified' },
+              hasNid: true,
+            },
+          }}
+          isSelf={false}
+          onSaved={handleSmmSaved}
+        />
+      )}
     </div>
   );
 }
+
