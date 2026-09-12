@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { UserMenu } from './UserMenu';
-import { Home, Layers, CalendarCheck, Zap, MessageSquare, Trophy, Gift, Wallet, Bell, Menu, LogOut, UserCog } from 'lucide-react';
+import { Home, Layers, CalendarCheck, Zap, Trophy, Gift, Wallet, Bell, Menu, LogOut, UserCog } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion } from 'motion/react';
-import { DemoControls } from '../../pages/smm/DemoControls';
+import { ChatWidget } from '../chat/ChatWidget';
 import { useSMM } from '../../contexts/SMMContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { AnimatePresence } from 'motion/react';
@@ -26,7 +26,6 @@ export function SMMLayout() {
     { name: 'Home', path: '/smm/home', icon: Home },
     { name: 'Hub', path: '/smm/hub', icon: Layers },
     { name: 'Missions', path: '/smm/missions', icon: CalendarCheck },
-    { name: 'Messages', path: '/smm/messages', icon: MessageSquare },
     { name: 'More', path: '/smm/more', icon: Menu },
   ];
 
@@ -35,7 +34,6 @@ export function SMMLayout() {
     { name: 'Hub', path: '/smm/hub', icon: Layers },
     { name: 'Missions', path: '/smm/missions', icon: CalendarCheck },
     { name: 'Rapid', path: '/smm/rapid-tasks', icon: Zap },
-    { name: 'Messages', path: '/smm/messages', icon: MessageSquare },
     { name: 'Career', path: '/smm/career', icon: Trophy },
     { name: 'Rewards', path: '/smm/rewards', icon: Gift },
     { name: 'Wallet', path: '/smm/wallet', icon: Wallet },
@@ -193,7 +191,7 @@ export function SMMLayout() {
           </div>
         </nav>
         
-        <DemoControls />
+        <ChatWidget launcherClassName="bottom-24 right-4 md:bottom-8 md:right-8" />
     </div>
   );
 }

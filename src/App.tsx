@@ -8,6 +8,7 @@ import { AdminLayout } from './components/layout/AdminLayout';
 import { SMMLayout } from './components/layout/SMMLayout';
 import { GuestOnly, HomeRedirect, RequireAuth } from './components/RequireAuth';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
 import { SMMProvider } from './contexts/SMMContext';
 
 // Auth Pages
@@ -26,7 +27,6 @@ import SMMHome from './pages/smm/Home';
 import SMMHub from './pages/smm/Hub';
 import SMMMissions from './pages/smm/Missions';
 import SMMRapidTasks from './pages/smm/RapidTasks';
-import SMMMessages from './pages/smm/Messages';
 import SMMCareer from './pages/smm/Career';
 import SMMRewards from './pages/smm/Rewards';
 import SMMWallet from './pages/smm/Wallet';
@@ -45,6 +45,7 @@ export default function App() {
   return (
     <AuthProvider>
       <SMMProvider>
+       <ChatProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomeRedirect />} />
@@ -84,7 +85,6 @@ export default function App() {
               <Route path="hub" element={<SMMHub />} />
               <Route path="missions" element={<SMMMissions />} />
               <Route path="rapid-tasks" element={<SMMRapidTasks />} />
-              <Route path="messages" element={<SMMMessages />} />
               <Route path="career" element={<SMMCareer />} />
               <Route path="rewards" element={<SMMRewards />} />
               <Route path="wallet" element={<SMMWallet />} />
@@ -96,6 +96,7 @@ export default function App() {
             <Route path="*" element={<HomeRedirect />} />
           </Routes>
         </BrowserRouter>
+       </ChatProvider>
       </SMMProvider>
     </AuthProvider>
   );

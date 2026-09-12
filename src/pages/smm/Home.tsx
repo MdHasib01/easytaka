@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSMM } from '../../contexts/SMMContext';
+import { useChat } from '../../contexts/ChatContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Progress } from '../../components/ui/Progress';
@@ -10,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function SMMHome() {
   const { smm, accounts, missions, claimJobHolderBonus } = useSMM();
+  const { open: openChat } = useChat();
   const navigate = useNavigate();
   const [showCelebration, setShowCelebration] = useState(false);
 
@@ -235,7 +237,7 @@ export default function SMMHome() {
            <Button variant="secondary" className="justify-start bg-slate-800/80 hover:bg-slate-700" onClick={() => navigate('/smm/hub')}>
              <Layers className="w-4 h-4 mr-2 text-indigo-400" /> Open Hub
            </Button>
-           <Button variant="secondary" className="justify-start bg-slate-800/80 hover:bg-slate-700" onClick={() => navigate('/smm/messages')}>
+           <Button variant="secondary" className="justify-start bg-slate-800/80 hover:bg-slate-700" onClick={() => openChat()}>
              <MessageSquare className="w-4 h-4 mr-2 text-emerald-400" /> Messages
            </Button>
            <Button variant="secondary" className="justify-start bg-slate-800/80 hover:bg-slate-700">

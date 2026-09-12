@@ -19,7 +19,8 @@ export default defineConfig(() => {
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       // Dev: forward API calls to the Express server (see server/README.md).
       proxy: {
-        '/api': process.env.API_PROXY_TARGET || 'http://localhost:5000',
+        // `ws: true` also forwards the chat WebSocket at /api/ws.
+        '/api': { target: process.env.API_PROXY_TARGET || 'http://localhost:5000', ws: true },
       },
     },
   };

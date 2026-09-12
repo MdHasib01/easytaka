@@ -68,6 +68,12 @@ export async function api<T>(path: string, { method = 'GET', body }: RequestOpti
   return data as T;
 }
 
+/** WebSocket URL for a path under the API base, e.g. wsUrl('/ws'). */
+export function wsUrl(path: string): string {
+  const base = BASE_URL.startsWith('http') ? BASE_URL : `${window.location.origin}${BASE_URL}`;
+  return base.replace(/^http/, 'ws') + path;
+}
+
 /** First field-level validation message, falling back to the error message. */
 export function errorMessage(err: unknown): string {
   if (err instanceof ApiError) return err.details?.[0]?.message ?? err.message;

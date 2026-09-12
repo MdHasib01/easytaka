@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
@@ -208,7 +208,7 @@ export function ProductsTab() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name, SKU, or category…"
+            placeholder="Search by name, SKU, or categoryâ€¦"
             className="w-full bg-slate-900 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all"
           />
         </div>
@@ -253,7 +253,7 @@ export function ProductsTab() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 bg-slate-900/30 rounded-2xl border border-white/5">
           <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
-          <p className="text-sm text-slate-400">Loading products catalog…</p>
+          <p className="text-sm text-slate-400">Loading products catalogâ€¦</p>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="text-center py-20 bg-slate-900/30 rounded-2xl border border-dashed border-white/10 p-6">
@@ -346,23 +346,9 @@ export function ProductsTab() {
                   <Users className="w-3.5 h-3.5 text-indigo-400" />
                   {product.assignedSmmCount ?? 0} SMMs
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setEditingProduct(product)}
-                    className="text-slate-300 hover:text-white font-medium text-xs bg-slate-700/60 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-white/5"
-                  >
-                    <Pencil className="w-3 h-3" /> Edit
-                  </button>
-                  <button
-                    onClick={() => setProductToDelete(product)}
-                    className="text-rose-400 hover:text-rose-300 font-medium text-xs bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-rose-500/20"
-                  >
-                    <Trash2 className="w-3 h-3" /> Delete
-                  </button>
-                  <button className="text-indigo-400 hover:text-indigo-300 font-medium text-xs bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-lg transition-colors">
-                    Assign SMM
-                  </button>
-                </div>
+                <button className="text-indigo-400 hover:text-indigo-300 font-medium text-xs bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-indigo-500/20 hover:border-indigo-500/30">
+                  Assign SMM
+                </button>
               </div>
             </Card>
           ))}
@@ -418,7 +404,7 @@ export function ProductsTab() {
                       {product.sku}
                     </td>
                     <td className="px-5 py-3.5 text-xs text-slate-400">
-                      {product.type || '—'}
+                      {product.type || 'â€”'}
                     </td>
                     <td className="px-5 py-3.5">
                       <Badge variant={product.status === 'Active' ? 'success' : 'secondary'}>

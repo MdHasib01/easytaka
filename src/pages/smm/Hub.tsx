@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSMM } from '../../contexts/SMMContext';
+import { useChat } from '../../contexts/ChatContext';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Progress } from '../../components/ui/Progress';
@@ -379,6 +380,7 @@ export default function SMMHub() {
 // ... Rest of the components will be written separately to avoid file size limit
 
 function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: SocialAccount, onClose: () => void, onSubmitStage: (stageId: string, proofData?: any) => void }) {
+  const { open: openChat } = useChat();
   const [activeTab, setActiveTab] = useState('Overview');
   const tabs = ['Overview', 'Persona', 'Enrichment', 'Notes', 'Account Access', 'Tasks'];
   const [showHistory, setShowHistory] = useState(false);
@@ -439,7 +441,7 @@ function AccountWorkspaceModal({ account, onClose, onSubmitStage }: { account: S
              </div>
           </div>
           <div className="flex items-center gap-3">
-             <Button variant="outline" size="sm" className="hidden sm:flex border-white/10 text-slate-300 hover:text-white bg-slate-800">
+             <Button variant="outline" size="sm" onClick={() => openChat({ view: 'new', role: 'MANAGER' })} className="hidden sm:flex border-white/10 text-slate-300 hover:text-white bg-slate-800">
                 <MessageSquare className="w-4 h-4 mr-2" /> Message Brand Manager
              </Button>
              <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0">
