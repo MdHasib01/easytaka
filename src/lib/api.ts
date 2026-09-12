@@ -1,6 +1,30 @@
 /// <reference types="vite/client" />
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || '/api';
+function resolveApiBaseUrl(): string {
+  const envUrl = (
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_BACKEND_URL ||
+    import.meta.env.VITE_SERVER_URL
+  )?.trim();
+
+  if (!envUrl) return '/api';
+
+  // Strip trailing slashes
+  const clean = envUrl.replace(/\/+$/, '');
+
+  // If full URL (http://... or https://...), ensure it ends with /api since backend routes are mounted at /api
+  if (/^https?:\/\//i.test(clean)) {
+    return clean.endsWith('/api') ? clean : `${clean}/api`;
+  }
+
+  // If relative path, ensure it ends with /api (defaults to /api)
+  if (clean === '' || clean === '/') return '/api';
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+}
+
+export const BASE_URL = resolveApiBaseUrl();
+export const API_URL = BASE_URL;
 
 export const TOKEN_KEY = 'et_token';
 /** The platform admin's own token, kept while they are logged in as a brand. */
@@ -54,9 +78,13 @@ export async function api<T>(path: string, { method = 'GET', body }: RequestOpti
     payload = JSON.stringify(body);
   }
 
+  // Normalize path: avoid duplicate /api if path already has it, and ensure leading slash
+  const normalizedPath = path.startsWith('/api/') ? path.slice(4) : path === '/api' ? '' : path;
+  const cleanPath = normalizedPath.startsWith('/') ? normalizedPath : normalizedPath ? `/${normalizedPath}` : '';
+
   let res: Response;
   try {
-    res = await fetch(`${BASE_URL}${path}`, { method, headers, body: payload });
+    res = await fetch(`${BASE_URL}${cleanPath}`, { method, headers, body: payload });
   } catch {
     throw new ApiError(0, 'Cannot reach the server. Check that the API is running.');
   }
@@ -70,8 +98,10 @@ export async function api<T>(path: string, { method = 'GET', body }: RequestOpti
 
 /** WebSocket URL for a path under the API base, e.g. wsUrl('/ws'). */
 export function wsUrl(path: string): string {
+  const normalizedPath = path.startsWith('/api/') ? path.slice(4) : path === '/api' ? '' : path;
+  const cleanPath = normalizedPath.startsWith('/') ? normalizedPath : normalizedPath ? `/${normalizedPath}` : '';
   const base = BASE_URL.startsWith('http') ? BASE_URL : `${window.location.origin}${BASE_URL}`;
-  return base.replace(/^http/, 'ws') + path;
+  return base.replace(/^http/, 'ws') + cleanPath;
 }
 
 /** First field-level validation message, falling back to the error message. */
