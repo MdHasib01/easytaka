@@ -182,13 +182,17 @@ export interface Brand {
 
 export interface Product {
   id: string;
-  brandId: string;
+  brandId?: string;
+  brand?: string | { id: string; name: string; logo?: string };
   name: string;
   sku: string;
-  type: string;
-  shortDescription: string;
+  type?: string;
+  shortDescription?: string;
+  image?: string;
   status: 'Active' | 'Inactive';
-  assignedSmmCount: number;
+  assignedSmmCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SMM {
