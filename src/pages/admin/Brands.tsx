@@ -333,7 +333,7 @@ export default function Brands() {
           >
             <div>
               <div className="flex items-start gap-4">
-                <BrandLogo logo={brand.logo} className="w-14 h-14 text-3xl shrink-0 ring-2 ring-white/10 shadow-lg" />
+                <BrandLogo logo={brand.logo} className="w-20 h-14 text-2xl shrink-0 ring-2 ring-white/10 shadow-lg p-1.5 bg-slate-900/60" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-base font-semibold text-white truncate">{brand.name}</h3>

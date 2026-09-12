@@ -89,7 +89,7 @@ export function BrandLogoUpload({ value, onChange, disabled }: BrandLogoUploadPr
     <div className="space-y-3">
       <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-900/50 border border-white/10">
         <div className="relative group shrink-0">
-          <BrandLogo logo={value} className="w-16 h-16 text-3xl rounded-2xl ring-2 ring-white/10 shadow-lg" />
+          <BrandLogo logo={value} className="w-24 h-16 text-3xl rounded-2xl ring-2 ring-white/10 shadow-lg p-1.5 bg-slate-900/60" />
           {uploading && (
             <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center backdrop-blur-xs">
               <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />

@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
 
+export interface BrandLogoProps {
+  logo?: string;
+  className?: string;
+  imageClassName?: string;
+  fit?: 'contain' | 'cover';
+}
+
 /** Brand logos are either an emoji or an image URL. */
-export function BrandLogo({ logo, className }: { logo?: string; className?: string }) {
+export function BrandLogo({
+  logo,
+  className,
+  imageClassName,
+  fit = 'contain',
+}: BrandLogoProps) {
   const [loadError, setLoadError] = useState(false);
   const trimmed = logo?.trim();
 
@@ -23,7 +35,7 @@ export function BrandLogo({ logo, className }: { logo?: string; className?: stri
   return (
     <div
       className={cn(
-        'relative bg-slate-800 rounded-xl border border-white/10 shadow-inner shrink-0 overflow-hidden select-none',
+        'relative bg-slate-800/90 rounded-xl border border-white/10 shadow-inner shrink-0 overflow-hidden select-none flex items-center justify-center',
         className,
       )}
     >
@@ -31,8 +43,12 @@ export function BrandLogo({ logo, className }: { logo?: string; className?: stri
         <img
           src={trimmed}
           alt="Brand logo"
-          className="absolute inset-0 w-full h-full object-cover block"
-          style={{ objectFit: 'cover', objectPosition: 'center', width: '100%', height: '100%' }}
+          className={cn(
+            'w-full h-full max-w-full max-h-full block select-none',
+            fit === 'contain' ? 'object-contain' : 'object-cover',
+            imageClassName,
+          )}
+          style={{ objectFit: fit, objectPosition: 'center' }}
           onError={() => setLoadError(true)}
         />
       ) : (
