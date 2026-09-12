@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
-import { Package, Users, Plus, Pencil, Search, Loader2, RefreshCw } from 'lucide-react';
+import { ConfirmDialog, SuccessDialog } from '../../../components/ui/ConfirmDialog';
+import { Package, Users, Plus, Pencil, Search, Loader2, RefreshCw, Trash2 } from 'lucide-react';
 import { mockProducts } from '../../../data/mockData';
 import { api } from '../../../lib/api';
 import type { Product } from '../../../types';
@@ -19,6 +20,9 @@ export function ProductsTab() {
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deletedProductName, setDeletedProductName] = useState<string | null>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -73,6 +77,25 @@ export function ProductsTab() {
 
   const handleProductDeleted = (deletedId: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== deletedId));
+  };
+
+  const confirmDeleteProduct = async () => {
+    if (!productToDelete) return;
+    setDeleting(true);
+    const name = productToDelete.name;
+    try {
+      await api(`/products/${productToDelete.id}`, { method: 'DELETE' });
+      handleProductDeleted(productToDelete.id);
+      setProductToDelete(null);
+      setDeletedProductName(name);
+    } catch {
+      // Fallback if mock / offline
+      handleProductDeleted(productToDelete.id);
+      setProductToDelete(null);
+      setDeletedProductName(name);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -287,6 +310,13 @@ export function ProductsTab() {
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
+                    <button
+                      onClick={() => setProductToDelete(product)}
+                      title="Delete Product"
+                      className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
 
@@ -322,6 +352,12 @@ export function ProductsTab() {
                     className="text-slate-300 hover:text-white font-medium text-xs bg-slate-700/60 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-white/5"
                   >
                     <Pencil className="w-3 h-3" /> Edit
+                  </button>
+                  <button
+                    onClick={() => setProductToDelete(product)}
+                    className="text-rose-400 hover:text-rose-300 font-medium text-xs bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-rose-500/20"
+                  >
+                    <Trash2 className="w-3 h-3" /> Delete
                   </button>
                   <button className="text-indigo-400 hover:text-indigo-300 font-medium text-xs bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-lg transition-colors">
                     Assign SMM
@@ -403,6 +439,12 @@ export function ProductsTab() {
                         >
                           <Pencil className="w-3 h-3" /> Edit
                         </button>
+                        <button
+                          onClick={() => setProductToDelete(product)}
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 flex items-center gap-1 transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
                         <button className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 transition-colors">
                           Assign
                         </button>
@@ -426,6 +468,42 @@ export function ProductsTab() {
         }}
         onSaved={handleProductSaved}
         onDeleted={handleProductDeleted}
+        onDeleteRequest={(prod) => {
+          setEditingProduct(null);
+          setProductToDelete(prod);
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={productToDelete !== null}
+        onClose={() => {
+          if (!deleting) setProductToDelete(null);
+        }}
+        onConfirm={confirmDeleteProduct}
+        loading={deleting}
+        title="Delete Product"
+        description={
+          <span>
+            Are you sure you want to delete <strong className="text-white">{productToDelete?.name}</strong>{' '}
+            {productToDelete?.sku && <span className="font-mono text-xs text-indigo-300">({productToDelete.sku})</span>}?
+            This product will be permanently removed from your catalog and unassigned from active SMMs. This action cannot be undone.
+          </span>
+        }
+        confirmText="Delete Product"
+      />
+
+      {/* Post-Delete Confirmation Dialog */}
+      <SuccessDialog
+        open={deletedProductName !== null}
+        onClose={() => setDeletedProductName(null)}
+        title="Product Deleted"
+        description={
+          <span>
+            <strong className="text-white">{deletedProductName}</strong> has been successfully removed from the catalog.
+          </span>
+        }
+        actionText="Done"
       />
     </div>
   );

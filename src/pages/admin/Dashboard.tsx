@@ -265,11 +265,7 @@ export default function BrandDashboard({ scope = 'brand' }: { scope?: WorkspaceS
                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                  <input type="text" placeholder="Search..." className="w-48 lg:w-64 bg-slate-900/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-slate-200 placeholder:text-slate-500" />
               </div>
-              
-              <button className="p-2 text-slate-400 hover:text-indigo-300 hover:bg-white/5 rounded-full transition-colors relative">
-                 <Bell className="w-5 h-5" />
-                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span>
-              </button>
+
               
               <div className="relative" ref={quickCreateRef}>
                 <Button 

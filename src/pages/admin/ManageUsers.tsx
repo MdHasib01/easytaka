@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { ExternalLink, IdCard, Loader2, Plus, Search, ShieldCheck, UserX, UserCheck, Pencil } from 'lucide-react';
+import { ExternalLink, IdCard, Loader2, Plus, Search, ShieldCheck, UserX, UserCheck, KeyRound, Copy, Check, CheckCircle2 } from 'lucide-react';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { BrandLogo } from '../../components/BrandLogo';
@@ -10,7 +10,6 @@ import { api, errorMessage } from '../../lib/api';
 import { ROLE_LABELS } from '../../lib/auth';
 import { cn } from '../../lib/utils';
 import { UserAvatar } from '../../components/common/UserAvatar';
-import { EditProfileModal } from '../../components/common/EditProfileModal';
 import type { AdminBrand, ManagedUser, NidDetails, Role, Verification, VerificationStatus } from '../../types';
 
 const VERIFICATION_VARIANT: Record<VerificationStatus, 'warning' | 'success' | 'error'> = {
@@ -285,6 +284,124 @@ function NidReviewModal({
   );
 }
 
+// ---- Reset Password Modal -----------------------------------------------------------
+
+function ResetPasswordModal({
+  user,
+  onClose,
+}: {
+  user: ManagedUser | null;
+  onClose(): void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ email: string; tempPassword?: string; message: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setResult(null);
+    setError(null);
+    setCopied(false);
+  }, [user]);
+
+  if (!user) return null;
+
+  const handleReset = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api<{ success: boolean; email: string; tempPassword?: string; message: string }>(
+        `/users/${user.id}/reset-password`,
+        { method: 'POST' }
+      );
+      setResult(res);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (result?.tempPassword) {
+      navigator.clipboard.writeText(result.tempPassword);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <Modal
+      open={Boolean(user)}
+      onClose={onClose}
+      title="Reset User Password"
+      description={`Generate and email a temporary password to ${user.name}`}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            {result ? 'Done' : 'Cancel'}
+          </Button>
+          {!result && (
+            <Button onClick={handleReset} disabled={loading} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Send Temporary Password
+            </Button>
+          )}
+        </>
+      }
+    >
+      <div className="space-y-4 text-sm">
+        <div className="p-3 bg-slate-950/60 rounded-xl border border-white/5 space-y-1">
+          <p className="text-xs text-slate-400">Target User Account:</p>
+          <p className="font-semibold text-white">
+            {user.name} <span className="text-xs text-slate-400 font-normal">({user.email})</span>
+          </p>
+          <p className="text-xs text-indigo-300 capitalize">
+            {user.role} {user.brand ? `· ${user.brand.name}` : ''}
+          </p>
+        </div>
+
+        {!result ? (
+          <p className="text-slate-300 leading-relaxed text-xs sm:text-sm">
+            Admins cannot alter user profile data. Clicking below will generate a temporary secure password and dispatch an email with the login credentials to <strong className="text-white">{user.email}</strong>.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>Temporary password generated and dispatched to <strong>{result.email}</strong>.</span>
+            </div>
+
+            {result.tempPassword && (
+              <div className="p-3.5 bg-slate-950 rounded-xl border border-white/10 space-y-1.5">
+                <div className="flex justify-between items-center text-xs text-slate-400">
+                  <span>Generated Temporary Password:</span>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied!' : 'Copy'}</span>
+                  </button>
+                </div>
+                <p className="font-mono text-base text-white tracking-wide select-all bg-slate-900/80 px-3 py-1.5 rounded-lg border border-white/5">
+                  {result.tempPassword}
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  The user can sign in using this temporary password and update it from their account settings.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <FormError message={error} />
+      </div>
+    </Modal>
+  );
+}
+
 // ---- Page ----------------------------------------------------------------------------
 
 type Tab = 'all' | 'verification';
@@ -304,7 +421,7 @@ export default function ManageUsers() {
   const [pendingCount, setPendingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const [editingUser, setEditingUser] = useState<ManagedUser | null>(null);
+  const [resetPasswordUser, setResetPasswordUser] = useState<ManagedUser | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -512,8 +629,8 @@ export default function ManageUsers() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setEditingUser(user)}>
-                        <Pencil className="w-4 h-4 mr-1.5" /> Edit Profile
+                      <Button size="sm" variant="outline" onClick={() => setResetPasswordUser(user)}>
+                        <KeyRound className="w-4 h-4 mr-1.5 text-amber-400" /> Reset Password
                       </Button>
                       {user.smm?.hasNid && (
                         <Button size="sm" variant="outline" onClick={() => setReviewingId(user.id)}>
@@ -554,18 +671,10 @@ export default function ManageUsers() {
         onCreated={(user) => setUsers((list) => (list ? [user, ...list] : [user]))}
       />
       <NidReviewModal userId={reviewingId} onClose={() => setReviewingId(null)} onReviewed={onReviewed} />
-      {editingUser && (
-        <EditProfileModal
-          open={Boolean(editingUser)}
-          onClose={() => setEditingUser(null)}
-          user={editingUser}
-          isSelf={editingUser.id === session?.user.id}
-          onSaved={(updated) => {
-            replaceUser(updated);
-            setEditingUser(null);
-          }}
-        />
-      )}
+      <ResetPasswordModal
+        user={resetPasswordUser}
+        onClose={() => setResetPasswordUser(null)}
+      />
     </div>
   );
 }

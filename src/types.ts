@@ -68,8 +68,9 @@ export interface ManagedUser extends Omit<AuthUser, 'brand'> {
 }
 
 export interface NidDetails {
-  user: { id: string; name: string; email: string; phone?: string };
-  brand: { id: string; name: string; logo: string } | null;
+  user?: { id: string; name: string; email: string; phone?: string };
+  brand?: { id: string; name: string; logo: string } | null;
+  hasNid?: boolean;
   number: string | null;
   nidDivision: string;
   assignedWorkingDivision?: string;
@@ -197,10 +198,13 @@ export interface Product {
 
 export interface SMM {
   id: string;
+  _id?: string;
   name: string;
   avatar: string;
-  role: string;
-  brandId: string;
+  role?: string;
+  designation?: string;
+  brandId?: string;
+  brand?: any;
   nidDivision: string;
   assignedWorkingDivision: string;
   managedIds: number;
@@ -210,11 +214,22 @@ export interface SMM {
   redeemableXp: number;
   currentStreak: number;
   qualityScore: number;
-  weeklyEarnings: number;
-  assignedProductIds: string[];
+  weeklyEarnings?: number;
+  assignedProductIds: (string | { _id: string; id?: string; name: string; sku?: string })[];
   status: 'Active' | 'Suspended';
   jobHolderUnlocked?: boolean;
   jobHolderBonusClaimed?: boolean;
+  reviewStats?: { approved: number; revision: number; rejected: number };
+  user?: {
+    _id?: string;
+    id?: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    status?: string;
+    lastLoginAt?: string;
+  };
 }
 
 export interface EnrichmentStage {

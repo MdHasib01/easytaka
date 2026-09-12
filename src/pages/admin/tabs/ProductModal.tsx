@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { Field, FormError, Input, Select, Textarea } from '../../../components/ui/Form';
 import { Modal } from '../../../components/ui/Modal';
@@ -14,6 +14,7 @@ interface ProductModalProps {
   onClose(): void;
   onSaved(saved: Product, isNew: boolean): void;
   onDeleted?(id: string): void;
+  onDeleteRequest?(product: Product): void;
 }
 
 interface BrandOption {
@@ -37,6 +38,7 @@ export function ProductModal({
   onClose,
   onSaved,
   onDeleted,
+  onDeleteRequest,
 }: ProductModalProps) {
   const { session } = useAuth();
   const isEdit = Boolean(product);
@@ -113,7 +115,7 @@ export function ProductModal({
   }, [open, product, session, brands]);
 
   const setField = (key: keyof typeof DEFAULT_FORM) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
@@ -200,7 +202,12 @@ export function ProductModal({
   };
 
   const handleDelete = async () => {
-    if (!product || !onDeleted) return;
+    if (!product) return;
+    if (onDeleteRequest) {
+      onDeleteRequest(product);
+      return;
+    }
+    if (!onDeleted) return;
     if (!confirmDelete) {
       setConfirmDelete(true);
       return;
@@ -212,7 +219,7 @@ export function ProductModal({
       await api(`/products/${product.id}`, { method: 'DELETE' });
       onDeleted(product.id);
       onClose();
-    } catch (err) {
+    } catch {
       // If error (e.g. offline/mock), still perform local deletion
       onDeleted(product.id);
       onClose();
@@ -234,7 +241,7 @@ export function ProductModal({
       size="lg"
       footer={
         <div className="w-full flex items-center justify-between gap-3">
-          {isEdit && onDeleted ? (
+          {isEdit && (onDeleteRequest || onDeleted) ? (
             <button
               type="button"
               onClick={handleDelete}

@@ -43,28 +43,36 @@ export function AdminLayout() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-4">
-            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-              <AppLogo size="md" href="/admin" />
-              <div className="h-6 w-px bg-white/10 hidden md:block"></div>
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <AppLogo size="sm" href={isPlatform ? '/admin' : '/admin/brand'} />
+              <div className="h-5 w-px bg-white/10 hidden sm:block"></div>
 
               {isPlatform ? (
-                <span className="hidden sm:inline text-sm font-medium text-slate-400">Platform Admin</span>
+                <span className="hidden sm:inline text-sm font-medium text-indigo-300 tracking-wide">
+                  Platform Admin
+                </span>
               ) : (
                 session?.brand && (
-                  <div className="flex items-center gap-2 min-w-0">
-                    <BrandLogo logo={session.brand.logo} className="w-8 h-8 text-base rounded-lg" />
-                    <div className="min-w-0 hidden sm:block">
-                      <p className="text-sm font-semibold text-white truncate">{session.brand.name}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{roleLabel(session)}</p>
-                    </div>
+                  <div className="hidden sm:flex items-center gap-2 min-w-0">
+                    <BrandLogo logo={session.brand.logo} className="w-6 h-6 text-xs rounded-lg border border-white/10 shrink-0" />
+                    <span className="text-sm font-semibold text-white truncate">
+                      {session.brand.name}
+                    </span>
+                    <span className="text-xs font-medium text-indigo-300/80 tracking-wide hidden md:inline">
+                      Brand Admin
+                    </span>
                   </div>
                 )
               )}
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="p-2 text-slate-400 hover:text-indigo-300 hover:bg-white/5 rounded-full transition-colors">
+              <button
+                className="relative text-slate-400 hover:text-white transition-colors cursor-pointer"
+                title="Notifications"
+              >
                 <Bell className="w-5 h-5" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#0B0F19]"></span>
               </button>
               <UserMenu />
             </div>

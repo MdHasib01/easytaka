@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Loader2, Pencil, Plus, Search, ShieldAlert, UserCog, Users } from 'lucide-react';
+import { ArrowRight, Building2, Loader2, Pencil, Plus, Search, ShieldAlert, Trash2, UserCog, Users } from 'lucide-react';
 import { BrandLogo } from '../../components/BrandLogo';
 import { BrandLogoUpload } from '../../components/BrandLogoUpload';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { ConfirmDialog, SuccessDialog } from '../../components/ui/ConfirmDialog';
 import { Field, FormError, Input, Select } from '../../components/ui/Form';
 import { Modal } from '../../components/ui/Modal';
 import { useAuth } from '../../contexts/AuthContext';
@@ -121,11 +122,13 @@ function EditBrandModal({
   open,
   onClose,
   onUpdated,
+  onDeleteRequest,
 }: {
   brand: AdminBrand | null;
   open: boolean;
   onClose(): void;
   onUpdated(brand: AdminBrand): void;
+  onDeleteRequest?(brand: AdminBrand): void;
 }) {
   const { refresh } = useAuth();
   const [form, setForm] = useState({
@@ -184,15 +187,30 @@ function EditBrandModal({
       title="Edit brand"
       description={`Update settings and information for ${brand.name}`}
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" form="edit-brand" disabled={saving}>
-            {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Save changes
-          </Button>
-        </>
+        <div className="w-full flex items-center justify-between gap-2">
+          {onDeleteRequest ? (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={saving}
+              onClick={() => onDeleteRequest(brand)}
+              className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs flex items-center gap-1.5"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete brand
+            </Button>
+          ) : (
+            <div />
+          )}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={onClose} disabled={saving}>
+              Cancel
+            </Button>
+            <Button type="submit" form="edit-brand" disabled={saving}>
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Save changes
+            </Button>
+          </div>
+        </div>
       }
     >
       <form id="edit-brand" onSubmit={submit} className="space-y-4">
@@ -257,6 +275,9 @@ export default function Brands() {
   const [creating, setCreating] = useState(false);
   const [editingBrand, setEditingBrand] = useState<AdminBrand | null>(null);
   const [openingId, setOpeningId] = useState<string | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<AdminBrand | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deletedBrandName, setDeletedBrandName] = useState<string | null>(null);
 
   useEffect(() => {
     api<AdminBrand[]>('/brands')
@@ -285,6 +306,26 @@ export default function Brands() {
     setBrands((list) =>
       list ? list.map((b) => (b.id === updated.id ? { ...b, ...updated } : b)) : [updated]
     );
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!brandToDelete) return;
+    setDeleting(true);
+    try {
+      await api(`/brands/${brandToDelete.id}`, { method: 'DELETE' });
+      const name = brandToDelete.name;
+      setBrands((list) => (list ? list.filter((b) => b.id !== brandToDelete.id) : []));
+      setBrandToDelete(null);
+      if (editingBrand?.id === brandToDelete.id) {
+        setEditingBrand(null);
+      }
+      setDeletedBrandName(name);
+    } catch (err) {
+      setError(errorMessage(err));
+      setBrandToDelete(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -347,6 +388,15 @@ export default function Brands() {
                         title="Edit brand"
                       >
                         <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+                        onClick={() => setBrandToDelete(brand)}
+                        title="Delete brand"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </div>
@@ -415,6 +465,42 @@ export default function Brands() {
         open={editingBrand !== null}
         onClose={() => setEditingBrand(null)}
         onUpdated={handleBrandUpdated}
+        onDeleteRequest={(brand) => {
+          setEditingBrand(null);
+          setBrandToDelete(brand);
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={brandToDelete !== null}
+        onClose={() => {
+          if (!deleting) setBrandToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        loading={deleting}
+        title="Delete Brand"
+        description={
+          <span>
+            Are you sure you want to delete <strong className="text-white">{brandToDelete?.name}</strong>?
+            This will permanently remove the brand along with its associated products, missions, and workforce data.
+            This action cannot be undone.
+          </span>
+        }
+        confirmText="Delete Brand"
+      />
+
+      {/* Post-Delete Confirmation Dialog */}
+      <SuccessDialog
+        open={deletedBrandName !== null}
+        onClose={() => setDeletedBrandName(null)}
+        title="Brand Deleted"
+        description={
+          <span>
+            <strong className="text-white">{deletedBrandName}</strong> has been successfully deleted.
+          </span>
+        }
+        actionText="Done"
       />
     </div>
   );
