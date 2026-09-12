@@ -1,0 +1,6 @@
+{
+  "name": "EASYTAKA SMM OPERATIONS",
+  "description": "SMM workforce system, brand operations, social account onboarding, mission flow, review flow, gamification, rewards and salary logic prototype.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

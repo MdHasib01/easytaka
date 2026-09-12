@@ -1,0 +1,440 @@
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { mockBrands, mockProducts, mockSMMs } from '../../data/mockData';
+import { Building2, Package, Users, CheckSquare, Zap, ShieldCheck, UserCheck, Trophy, BarChart3, Plus, Settings, AlertCircle, PlayCircle, Eye, Settings2, Share2, Copy } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+export default function AdminDashboard() {
+  const brand = mockBrands[0];
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const tabItems = [
+    { value: 'overview', label: 'Overview', icon: Building2 },
+    { value: 'details', label: 'Brand Details', icon: Settings2 },
+    { value: 'products', label: 'Products', icon: Package },
+    { value: 'workforce', label: 'Workforce', icon: Users },
+    { value: 'missions', label: 'Missions', icon: CheckSquare },
+    { value: 'rapid-tasks', label: 'Rapid Tasks', icon: Zap },
+    { value: 'review', label: 'Review Center', icon: ShieldCheck },
+    { value: 'reviewers', label: 'Reviewer Management', icon: UserCheck },
+    { value: 'gamification', label: 'Gamification', icon: Trophy },
+    { value: 'reports', label: 'Reports', icon: BarChart3 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Brand Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-xl p-6 rounded-2xl shadow-sm border border-white/10 relative overflow-hidden">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-3xl border border-white/10 shadow-inner">
+            {brand.logo}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-white tracking-tight">{brand.name}</h1>
+              <Badge variant="success">Active</Badge>
+            </div>
+            <p className="text-slate-400 mt-1 flex items-center gap-2 text-sm">
+              <span>{brand.industry}</span>
+              <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+              <span>{brand.primaryPlatform}</span>
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2 relative z-10">
+          <Button variant="outline"><Settings className="w-4 h-4 mr-2" /> Settings</Button>
+          <Button><Plus className="w-4 h-4 mr-2" /> Invite SMM</Button>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
+          <TabsList className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-1.5 w-max">
+            {tabItems.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value} className="gap-2">
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        <TabsContent value="overview" className="mt-6">
+          <OverviewTab />
+        </TabsContent>
+
+        <TabsContent value="details" className="mt-6">
+          <BrandDetailsTab brand={brand} />
+        </TabsContent>
+
+        <TabsContent value="products" className="mt-6">
+          <ProductsTab />
+        </TabsContent>
+
+        <TabsContent value="workforce" className="mt-6">
+          <WorkforceTab />
+        </TabsContent>
+        
+        {/* Placeholders for others - Deep logic can be expanded here */}
+        {['missions', 'rapid-tasks', 'review', 'reviewers', 'gamification', 'reports'].map(tab => (
+          <TabsContent key={tab} value={tab} className="mt-6">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="capitalize text-indigo-400">{tab.replace('-', ' ')}</CardTitle>
+                 <CardDescription>Deep logic module for {tab} is structurally ready.</CardDescription>
+               </CardHeader>
+               <CardContent className="py-12 flex flex-col items-center justify-center text-center border-t border-white/5 bg-slate-800/30 rounded-b-2xl">
+                 <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 mb-4">
+                    <PlayCircle className="w-8 h-8 text-slate-500" />
+                 </div>
+                 <h3 className="text-lg font-medium text-slate-300">Module Available</h3>
+                 <p className="text-sm text-slate-500 max-w-sm mt-2">The architecture for this module has been mapped and is ready for data integration.</p>
+               </CardContent>
+             </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+}
+
+function OverviewTab() {
+  const stats = [
+    { label: 'Total Products', value: mockProducts.length.toString() },
+    { label: 'Assigned SMMs', value: mockSMMs.length.toString() },
+    { label: 'Active IDs', value: '16' },
+    { label: 'Pending Enrichment', value: '4' },
+    { label: 'Quality Score', value: '94%' },
+  ];
+
+  const data = [
+    { name: 'Mon', completed: 12, target: 15 },
+    { name: 'Tue', completed: 15, target: 15 },
+    { name: 'Wed', completed: 14, target: 15 },
+    { name: 'Thu', completed: 18, target: 15 },
+    { name: 'Fri', completed: 15, target: 15 },
+    { name: 'Sat', completed: 10, target: 10 },
+    { name: 'Sun', completed: 8, target: 10 },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-5 gap-4">
+        {stats.map((stat, i) => (
+          <Card key={i} className="hover:border-indigo-500/30 transition-colors">
+            <CardContent className="p-4 sm:p-6">
+              <p className="text-sm font-medium text-slate-400">{stat.label}</p>
+              <p className="text-3xl font-bold text-white mt-2 tracking-tight">{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="md:col-span-2">
+        <CardHeader className="border-b border-white/5">
+          <CardTitle>Mission Completion (7 Days)</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
+                <Tooltip 
+                  cursor={{fill: '#1e293b'}}
+                  contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)'}}
+                  itemStyle={{color: '#818cf8'}}
+                />
+                <Bar dataKey="completed" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="target" fill="#334155" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader className="border-b border-white/5">
+          <CardTitle>Needs Attention</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-between p-4 bg-amber-500/10 rounded-xl border border-amber-500/20">
+            <div>
+              <p className="text-sm font-medium text-amber-400">4 Enriched IDs Pending Review</p>
+              <p className="text-xs text-amber-500/70 mt-0.5">Awaiting approval</p>
+            </div>
+            <Button size="sm" variant="secondary" className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/30">Review</Button>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-rose-500/10 rounded-xl border border-rose-500/20">
+            <div>
+              <p className="text-sm font-medium text-rose-400">1 SMM Missing Targets</p>
+              <p className="text-xs text-rose-500/70 mt-0.5">Rafi Islam</p>
+            </div>
+            <Button size="sm" variant="secondary" className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/30">View</Button>
+          </div>
+          
+          <div className="mt-8 pt-6 border-t border-white/5">
+             <h4 className="text-sm font-medium text-slate-400 mb-4">Weekly Payroll Estimate</h4>
+             <div className="text-3xl font-bold text-emerald-400 font-mono">৳12,450</div>
+             <p className="text-xs text-slate-500 mt-2">Based on current approved ID tiers and completed rapid tasks.</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function BrandDetailsTab({ brand }: { brand: any }) {
+  const [isEditing, setIsEditing] = useState(false);
+  
+  return (
+     <div className="space-y-6 max-w-4xl">
+        <div className="flex justify-between items-center">
+           <h2 className="text-xl font-bold text-white">Configuration Rules</h2>
+           <Button variant={isEditing ? 'default' : 'outline'} onClick={() => setIsEditing(!isEditing)}>
+              {isEditing ? 'Save Changes' : 'Edit Rules'}
+           </Button>
+        </div>
+
+        <Card>
+           <CardHeader className="border-b border-white/5 pb-4">
+              <CardTitle className="text-indigo-400">Basic Information</CardTitle>
+           </CardHeader>
+           <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                 <label className="text-sm font-medium text-slate-400">Brand Name</label>
+                 <input type="text" defaultValue={brand.name} disabled={!isEditing} className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white disabled:opacity-50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none" />
+              </div>
+              <div className="space-y-2">
+                 <label className="text-sm font-medium text-slate-400">Industry</label>
+                 <input type="text" defaultValue={brand.industry} disabled={!isEditing} className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white disabled:opacity-50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none" />
+              </div>
+           </CardContent>
+        </Card>
+
+        <Card>
+           <CardHeader className="border-b border-white/5 pb-4">
+              <CardTitle className="text-indigo-400">Account Setup & Enrichment Guidelines</CardTitle>
+           </CardHeader>
+           <CardContent className="pt-6 space-y-6">
+              <div className="space-y-2">
+                 <label className="text-sm font-medium text-slate-400">Email Creation Rule</label>
+                 <textarea defaultValue="Format must be: firstname.milkimom.number@gmail.com (e.g. rafi.milkimom.01@gmail.com)" disabled={!isEditing} className="w-full h-24 bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white disabled:opacity-50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none" />
+              </div>
+              <div className="space-y-2">
+                 <label className="text-sm font-medium text-slate-400">Required Enrichment Checkpoints</label>
+                 <div className="space-y-3">
+                    {['Profile Information Complete', 'Cover Photo Added', 'Minimum 5 organic timeline posts', 'Joined 3 targeted parenting groups'].map((rule, idx) => (
+                       <div key={idx} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-white/5">
+                          <span className="text-sm text-slate-300">{rule}</span>
+                          {isEditing && <button className="text-slate-500 hover:text-rose-400">✕</button>}
+                       </div>
+                    ))}
+                    {isEditing && <Button variant="outline" size="sm" className="w-full border-dashed">Add Checkpoint</Button>}
+                 </div>
+              </div>
+           </CardContent>
+        </Card>
+     </div>
+  )
+}
+
+function ProductsTab() {
+  const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [productsPerSmm, setProductsPerSmm] = useState(4);
+  const totalProducts = mockProducts.length;
+  const suggestedSmm = Math.ceil(totalProducts / productsPerSmm);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h2 className="text-xl font-bold text-white">Products Catalog</h2>
+        <div className="flex items-center gap-2">
+          <div className="bg-slate-800 p-1 rounded-lg border border-white/5 flex">
+             <button onClick={() => setView('grid')} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'grid' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}>Grid</button>
+             <button onClick={() => setView('table')} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'table' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}>Table</button>
+          </div>
+          <Button><Plus className="w-4 h-4 mr-2" /> Add Product</Button>
+        </div>
+      </div>
+
+      {/* Product-to-SMM Assignment Engine configuration */}
+      <Card className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border-indigo-500/20">
+         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+               <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30">
+                  <Package className="w-6 h-6 text-indigo-400" />
+               </div>
+               <div>
+                  <h3 className="font-semibold text-white">Workforce Assignment Rule</h3>
+                  <p className="text-sm text-slate-400">Configure how many products one SMM can handle.</p>
+               </div>
+            </div>
+            
+            <div className="flex items-center gap-8">
+               <div className="text-center">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Products per SMM</p>
+                  <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 border border-white/10">
+                     <button onClick={() => setProductsPerSmm(Math.max(1, productsPerSmm - 1))} className="w-8 h-8 rounded-md bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center">-</button>
+                     <span className="w-8 text-center font-bold text-white">{productsPerSmm}</span>
+                     <button onClick={() => setProductsPerSmm(productsPerSmm + 1)} className="w-8 h-8 rounded-md bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center">+</button>
+                  </div>
+               </div>
+               
+               <div className="h-10 w-px bg-white/10"></div>
+               
+               <div className="text-center">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Products</p>
+                  <p className="text-xl font-bold text-white">{totalProducts}</p>
+               </div>
+               
+               <div className="h-10 w-px bg-white/10"></div>
+               
+               <div className="text-center">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Suggested SMMs</p>
+                  <p className="text-xl font-bold text-emerald-400">{suggestedSmm}</p>
+               </div>
+            </div>
+         </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {mockProducts.map(product => (
+          <Card key={product.id} className="hover:border-indigo-500/40 transition-colors group">
+            <CardHeader className="pb-4">
+              <div className="flex justify-between items-start">
+                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-xl border border-white/5 shadow-inner">
+                  📦
+                </div>
+                <Badge variant={product.status === 'Active' ? 'success' : 'secondary'}>{product.status}</Badge>
+              </div>
+              <CardTitle className="mt-4 text-base">{product.name}</CardTitle>
+              <p className="text-xs text-slate-400 font-mono mt-1">{product.sku}</p>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-slate-400 line-clamp-2">{product.shortDescription}</p>
+            </CardContent>
+            <div className="border-t border-white/5 p-4 bg-slate-800/30 rounded-b-2xl flex justify-between items-center text-sm text-slate-400">
+               <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-indigo-400" /> {product.assignedSmmCount} SMMs</span>
+               <button className="text-indigo-400 hover:text-indigo-300 font-medium text-xs bg-indigo-500/10 px-3 py-1.5 rounded-lg transition-colors">Assign SMM</button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WorkforceTab() {
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <h2 className="text-xl font-bold text-white">Workforce Directory</h2>
+        <div className="flex items-center gap-2">
+           <Button variant="outline">Division Filter</Button>
+           <Button variant="outline">Performance Filter</Button>
+        </div>
+      </div>
+      
+      {/* Division Logic Notice */}
+      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex items-start gap-4">
+         <div className="mt-0.5">
+           <ShieldCheck className="w-5 h-5 text-indigo-400" />
+         </div>
+         <div>
+            <h4 className="text-sm font-semibold text-indigo-300">Division Assignment Policy Active</h4>
+            <p className="text-xs text-indigo-200/70 mt-1">SMMs must be assigned to work in a division different from their NID division. The system automatically flags cross-division violations.</p>
+         </div>
+      </div>
+      
+      <Card className="overflow-hidden border-white/5 bg-slate-900/60 backdrop-blur-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-800/50 text-slate-400 border-b border-white/5">
+              <tr>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">SMM Profile</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Division Constraint</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Products ({mockSMMs[0].assignedProductIds.length}/4)</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Hub Progress</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Quality & Level</th>
+                <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {mockSMMs.map(smm => {
+                 const isDivisionValid = smm.nidDivision !== smm.assignedWorkingDivision;
+                 
+                 return (
+                <tr key={smm.id} className="hover:bg-slate-800/30 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg border border-white/10 shadow-inner">
+                        {smm.avatar}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-200">{smm.name}</div>
+                        <div className="text-xs text-slate-500">{smm.role}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs text-slate-500 w-8">NID:</span>
+                         <Badge variant="secondary" className="text-[10px]">{smm.nidDivision}</Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs text-slate-500 w-8">Work:</span>
+                         <Badge variant={isDivisionValid ? 'success' : 'error'} className="text-[10px]">{smm.assignedWorkingDivision}</Badge>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                      {smm.assignedProductIds.map(id => (
+                        <Badge key={id} variant="outline" className="text-[10px] bg-slate-800">{mockProducts.find(p=>p.id===id)?.name.split(' ')[1]}</Badge>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-1.5 w-32">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-400">{smm.approvedEnrichedIds} / {smm.managedIds} IDs</span>
+                        <span className="font-bold text-emerald-400">{Math.round((smm.approvedEnrichedIds/smm.managedIds)*100)}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                        <div className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" style={{width: `${(smm.approvedEnrichedIds/smm.managedIds)*100}%`}}></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs text-slate-400">Score:</span>
+                         <span className="text-sm font-bold text-emerald-400">{smm.qualityScore}%</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs text-slate-400">Level:</span>
+                         <Badge variant="default" className="text-[10px] bg-indigo-500/20">{smm.level}</Badge>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <Button size="sm" variant="secondary" className="bg-slate-800 hover:bg-slate-700">Open Profile</Button>
+                  </td>
+                </tr>
+              )})}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
